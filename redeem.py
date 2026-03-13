@@ -47,7 +47,7 @@ REDEEM_CODES = {
     },
     "114514": {
         #新手福利!!!!↑
-        "gold": 200,
+        "gold": 2000000000,
         "card_count": 4,
         "exclude_quality": [],        # 排除的品质
         "description": "200金币 + 4张卡牌"
