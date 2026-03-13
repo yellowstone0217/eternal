@@ -1,0 +1,597 @@
+[
+    {
+        "id": 1,
+        "name": "轰炸虫",
+        "attack": 1,
+        "health": 3,
+        "cost": 2,
+        "description": "",
+        "quality": "普通",
+        "image": "mage.png"
+    },
+    {
+        "id": 2,
+        "name": "探察者",
+        "attack": 1,
+        "health": 5,
+        "cost": 2,
+        "effect": ["守护"],
+        "quality": "普通",
+        "description": "",
+        "image": "scout_yyds.png"
+    },
+    {
+        "id": 3,
+        "quality": "特殊",
+        "name": "羽毛笔",
+        "attack": 3,
+        "health": 10,
+        "cost": 12,
+        "description": "",
+        "image": "羽毛笔.png"
+    },
+    {
+        "id": 4,
+        "name": "蚀骨",
+        "quality": "特殊",
+        "attack": 3,
+        "health": 1,
+        "effect": ["收缴"],
+        "cost": 6,
+        "description": "",
+        "image": "蚀骨.png"
+    },
+    {
+        "id": 5,
+        "quality": "限定",
+        "name": "刺刀",
+        "attack": 2,
+        "health": 2,
+        "effect": ["收缴"],
+        "cost": 3,
+        "description": "",
+        "image": "刺刀悬浮坦克.png"
+    },
+    {
+        "id": 6,
+        "name": "黄色菌毯",
+        "attack": 1,
+        "quality": "普通",
+        "health": 1,
+        "cost": 0,
+        "description": "",
+        "effect": ["闪击"],
+        "image": "yellow.png"
+    },
+    {
+        "id": 7,
+        "name": "甲壳虫重型坦克",
+        "attack": 2,
+        "quality": "普通",
+        "health": 4,
+        "cost": 4,
+        "description": "",
+        "image": "jk.png"
+    },
+    {
+        "id": 8,
+        "name": "拳击手坦克",
+        "attack": 2,
+        "quality": "限定",
+        "health": 1,
+        "cost": 2,
+        "description": "",
+        "effect": ["闪击"],
+        "image": "Q.png"
+    },
+    {
+        "id": 9,
+        "name": "攻城坦克",
+        "attack": 1,
+        "quality": "精英",
+        "health": 3,
+        "cost": 3,
+        "description": "本单位造成的伤害为4",
+        "image": "FBD.png"
+    },
+    {
+        "id": 10,
+        "name": "虫菌生带",
+        "attack": 1,
+        "quality": "限定",
+        "health": 2,
+        "cost": 0,
+        "description": "",
+        "image": "1767250267422.png"
+    },
+    {
+        "id": 11,
+        "name": "风云",
+        "attack": 3,
+        "quality": "特殊",
+        "health": 2,
+        "cost": 3,
+        "description": "",
+        "image": "毛驴.png"
+    },
+    {
+        "id": 12,
+        "name": "飞行堡垒",
+        "attack": 5,
+        "quality": "精英",
+        "health": 5,
+        "cost": 8,
+        "description": "",
+        "image": "B17飞行堡垒.png"
+    },
+    {
+        "id": 13,
+        "name": "棍母防空车",
+        "attack": 1,
+        "quality": "普通",
+        "health": 2,
+        "cost": 3,
+        "description": "",
+        "effect": ["守护"],
+        "image": "棍母.png"
+    },
+    {
+        "name": "虫王万岁",
+        "type": "spell",
+        "cost": 5,
+        "effect": ["将两张抵抗加入敌方牌库顶"],
+        "description": "将两张「抵抗」洗入敌方牌库顶。",
+        "quality": "特殊",
+        "image": "抵抗.png",
+        "sound": "/static/sounds/伪人.wav",
+        "hiddeneffect": ["将两张抵抗加入敌方牌库顶"]
+    },
+    {
+        "name": "先锋者运输艇",
+        "type": "spell",
+        "quality": "特殊",
+        "cost": 2,
+        "effect": ["使己方卡组所有单位获得+1血量"],
+        "description": "使己方卡组中所有单位牌的生命值永久+1",
+        "image": "先锋.png",
+        "sound": "/static/sounds/朱可夫.wav"
+    },
+    {
+        "name": "等离子机枪机甲",
+        "type": "minion",
+        "quality": "限定",
+        "cost": 2,
+        "attack": 2,
+        "health": 1,
+        "description": "友方使用指令时，随机对一个敌方目标造成1点伤害",
+        "image": "机枪.png"
+    },
+    {
+        "name": "石油需要",
+        "type": "spell",
+        "quality": "普通",
+        "cost": 2,
+        "description": "额外获得一个指挥点槽",
+        "image": "石油.png",
+        "sound": "/static/sounds/美国.wav"
+    },
+    {
+        "name": "仔细生产",
+        "type": "spell",
+        "quality": "特殊",
+        "cost": 3,
+        "description": "使己方卡组中所有单位牌的攻击力永久+1",
+        "image": "生产.png",
+        "sound": "/static/sounds/弃牌.wav"
+    },
+    {
+        "name": "抵抗",
+        "type": "spell",
+        "cost": 1,
+        "description": "",
+        "image": "抵抗.png",
+        "hidden": true,
+        "sound": "/static/sounds/法国.wav"
+    },
+    {
+        "id": 14,
+        "name": "歼灭者自爆无人机",
+        "attack": 3,
+        "quality": "限定",
+        "health": 1,
+        "cost": 4,
+        "description": "",
+        "effect": ["闪击"],
+        "image": "叙利亚.png"
+    },
+    {
+        "id": 15,
+        "name": "直升机",
+        "attack": 2,
+        "quality": "普通",
+        "health": 2,
+        "cost": 5,
+        "description": "",
+        "image": "科比.png"
+    },
+    {
+        "id": 16,
+        "name": "四级等离子机甲",
+        "attack": 5,
+        "quality": "特殊",
+        "health": 6,
+        "cost": 10,
+        "description": "",
+        "effect": ["守护"],
+        "image": "四级等离子.png"
+    },
+    {
+        "id": 17,
+        "name": "扫射攻击机",
+        "attack": 3,
+        "quality": "限定",
+        "health": 4,
+        "cost": 4,
+        "description": "",
+        "image": "扫射.png"
+    },
+    {
+        "name": "战争需要",
+        "type": "spell",
+        "quality": "限定",
+        "cost": 4,
+        "description": "额外获得两个指挥点槽",
+        "image": "战争需要.png",
+        "sound": "/static/sounds/美国.wav"
+    },
+    {
+        "name": "战争债券",
+        "type": "spell",
+        "quality": "限定",
+        "cost": 5,
+        "description": "额外获得两个指挥点槽,下个友方回合开始时,额外抽一张牌",
+        "image": "战争债券.png",
+        "sound": "/static/sounds/美国.wav"
+    },
+    {
+        "name": "反潜巡逻",
+        "type": "spell",
+        "quality": "限定",
+        "cost": 7,
+        "description": "额外获得两个指挥点槽,随机消灭一个敌方单位",
+        "image": "反潜巡逻.png",
+        "sound": "/static/sounds/美国.wav"
+    },
+    {
+        "name": "坚固防线",
+        "type": "spell",
+        "quality": "特殊",
+        "cost": 0,
+        "description": "使一个友方单位获得+1+1",
+        "image": "防线.png",
+        "sound": "/static/sounds/拉伸.wav"
+    },
+    {
+        "name": "轻型战术机",
+        "type": "unit",
+        "cost": 1,
+        "attack": 1,
+        "health": 2,
+        "image": "AI.png",
+        "description": "",
+        "quality": "特殊"
+    },
+    {
+        "name": "黎明终焉",
+        "type": "spell",
+        "quality": "特殊",
+        "cost": 4,
+        "description": "将卡组顶的一个单位的复制加入战场",
+        "image": "赤城号.png",
+        "sound": "/static/sounds/老咖喱.wav"
+    },
+    {
+        "name": "前线与家乡",
+        "type": "spell",
+        "quality": "限定",
+        "cost": 2,
+        "description": "使卡组中的所有单位获得-1花费,若是“黄色菌毯”和“虫菌生带”,再使其获得+1+1",
+        "image": "前线与家乡.png",
+        "sound": "/static/sounds/老咖喱.wav"
+    },
+    {
+        "name": "伟大的虫族母王",
+        "type": "spell",
+        "quality": "精英",
+        "cost": 3,
+        "description": "抽一张牌,对所有敌方单位造成2点伤害",
+        "image": "伟大的卫虫战争.png",
+        "sound": "/static/sounds/伪人.wav"
+    },
+    {
+        "name": "妥协",
+        "type": "spell",
+        "quality": "普通",
+        "cost": 5,
+        "description": "双方抽两张牌,角色各恢复8点生命值",
+        "image": "妥协.png",
+        "sound": "/static/sounds/法国.wav"
+    },
+    {
+        "id": 19,
+        "name": "B25米切尔",
+        "attack": 1,
+        "quality": "普通",
+        "health": 2,
+        "cost": 1,
+        "effect": ["闪击"],
+        "description": "本单位因其他卡牌增加攻击力时,+2攻击力",
+        "image": "B25米切尔.png"
+    },
+    {
+        "id": 20,
+        "name": "雅克9M",
+        "attack": 4,
+        "quality": "精英",
+        "health": 5,
+        "cost": 5,
+        "effect": ["闪击"],
+        "description": "",
+        "image": "雅克9M.jpg"
+    },
+    {
+        "name": "土地女孩",
+        "type": "spell",
+        "cost": 2,
+        "image": "土地女孩.png",
+        "quality": "普通",
+        "hidden": false,
+        "description": "友方抽两张牌,友方角色增加3点生命值",
+        "sound": "/static/sounds/伪人.wav"
+    },
+    {
+        "name": "突击队突击",
+        "type": "spell",
+        "cost": 4,
+        "image": "突击队突击.png",
+        "quality": "限定",
+        "description": "将两个2/2的等离子机枪机甲加入友方战场",
+        "hidden": false,
+        "sound": "/static/sounds/装甲列车.wav"
+    },
+    {
+        "name": "国土巡逻队",
+        "type": "spell",
+        "cost": 2,
+        "description": "对一个敌方单位造成2点伤害,将一张“卫戍”加入手牌",
+        "image": "国土巡逻队.png",
+        "quality": "普通",
+        "hidden": false,
+        "sound": "/static/sounds/法国.wav"
+    },
+    {
+        "name": "卫戍",
+        "type": "unit",
+        "cost": 1,
+        "attack": 1,
+        "health": 2,
+        "effect": ["守护"],
+        "image": "卫戍.png",
+        "quality": "普通",
+        "hidden": true
+    },
+    {
+        "name": "重整旗鼓",
+        "type": "spell",
+        "cost": 4,
+        "image": "重整旗鼓.png",
+        "quality": "限定",
+        "description": "随机将卡组里一个单位的2/2复制加入友方战场",
+        "hidden": false,
+        "sound": "/static/sounds/老咖喱.wav"
+    },
+    {
+        "name": "阴云密布",
+        "type": "spell",
+        "cost": 2,
+        "effect": [],
+        "description": "双方抽一张牌,双方英雄恢复3点生命值",
+        "image": "阴云密布.png",
+        "quality": "普通",
+        "hidden": false,
+        "sound": "/static/sounds/美国.wav"
+    },
+    {
+        "name": "好人寥寥",
+        "type": "spell",
+        "quality": "特殊",
+        "cost": 2,
+        "description": "开发一张精英牌",
+        "image": "好人寥寥.png",
+        "sound": "/static/sounds/美国.wav"
+    },
+    {
+        "name": "竞争战法",
+        "type": "spell",
+        "quality": "限定",
+        "cost": 4,
+        "description": "随机将一张特殊牌加入手牌",
+        "image": "竞争战法.png",
+        "sound": "/static/sounds/朱可夫.wav"
+    },
+    {
+        "name": "鱼雷",
+        "type": "spell",
+        "quality": "特殊",
+        "cost": 3,
+        "description": "随机复制敌方卡组中的1张指令，使友方角色获得等同于其花费的生命值。",
+        "image": "鱼雷.png",
+        "sound": "/static/sounds/美国.wav"
+    },
+    {
+        "name": "激光防御装置",
+        "type": "unit",
+        "quality": "限定",
+        "cost": 2,
+        "attack": 0,
+        "health": 6,
+        "description": "友方目标受到伤害时，改为由本单位承受。",
+        "image": "激光防御.png"
+    },
+    {
+        "name": "爽口酱汁",
+        "cost": 15,
+        "type": "spell",
+        "quality": "精英",
+        "description": "使友方所有单位和卡组里的单位获得收缴",
+        "image": "爽口酱汁.png",
+        "sound": "/static/sounds/装甲列车.wav"
+    },
+    {
+        "name": "白色死神[羽笙]",
+        "type": "spell",
+        "quality": "精英",
+        "cost": 4,
+        "description": "使所有敌方单位变为1/1，将一个具有闪击的游击队员加入友方战场。",
+        "image": "羽笙.png",
+        "sound": "/static/sounds/芬兰.wav"
+    },
+    {
+        "name": "游击队员",
+        "type": "unit",
+        "quality": "特殊",
+        "cost": 1,
+        "attack": 1,
+        "health": 1,
+        "effect": ["闪击"],
+        "hidden": true,
+        "description": "消灭受到本单位对战伤害的单位。",
+        "image": "游击队员.png"
+    },
+    {
+        "id": 21,
+        "name": "监察者",
+        "type": "spell",
+        "attack": 2,
+        "health": 1,
+        "cost": 1,
+        "effect": ["闪击"],
+        "quality": "普通",
+        "description": "",
+        "image": "监察者.png"
+    },
+    {
+        "name": "钓鱼执法",
+        "type": "spell",
+        "quality": "特殊",
+        "cost": 3,
+        "description": "对一个单位造成2点伤害，将一个游击队员加入手牌，使其获得收缴",
+        "image": "钓鱼执法.png",
+        "sound": "/static/sounds/拉伸.wav"
+    },
+    {
+        "name": "弱肉强食",
+        "type": "spell",
+        "quality": "精英",
+        "cost": 3,
+        "description": "消灭并收缴所有攻击力最低的单位，优先收缴游击队员。若手牌已满，则将收缴的卡牌置入牌库底。",
+        "image": "弱肉强食.png",
+        "sound": "/static/sounds/日本.wav"
+    },
+    {
+        "name": "以毒攻毒",
+        "type": "spell",
+        "quality": "特殊",
+        "cost": 3,
+        "description": "消灭一个敌方单位，其控制者抽两张牌",
+        "image": "以毒攻毒.png",
+        "sound": "/static/sounds/法国.wav"
+    },
+    {
+        "name": "第78海军旅",
+        "type": "unit",
+        "quality": "普通",
+        "cost": 3,
+        "attack": 2,
+        "health": 4,
+        "effect": ["海军"],
+        "description": "友方使用海军牌时，对敌方角色造成2点伤害",
+        "image": "海军旅.png"
+    },
+    {
+        "name": "崛起吧!!!海军",
+        "type": "spell",
+        "quality": "精英",
+        "cost": 4,
+        "description": "使卡组里的所有指令牌算作海军（本局游戏生效）",
+        "image": "崛起吧海军.png",
+        "effect": ["海军"],
+        "sound": "/static/sounds/朱可夫.wav"
+    },
+    {
+        "name": "散弹火炮",
+        "type": "unit",
+        "quality": "限定",
+        "cost": 4,
+        "attack": 3,
+        "health": 3,
+        "description": "本单位攻击时，对相邻目标造成1点伤害",
+        "image": "散弹火炮.png"
+    },
+    {
+        "name": "先锋者主战坦克",
+        "type": "unit",
+        "quality": "精英",
+        "cost": 4,
+        "attack": 3,
+        "health": 4,
+        "description": "",
+        "effect": ["收缴"],
+        "image": "先锋者主战坦克.png"
+    },
+    {
+        "name": "伟大虫族银行",
+        "type": "spell",
+        "quality": "限定",
+        "cost": 0,
+        "description": "获得2个指挥点",
+        "image": "虫族银行.png",
+        "sound": "/static/sounds/美国.wav"
+    },
+    {
+        "name": "澎湃力量",
+        "type": "spell",
+        "quality": "普通",
+        "cost": 6,
+        "description": "抽两张牌。本场对局中，友方每增加一个指挥点槽，获得2个指挥点",
+        "image": "澎湃力量.png",
+        "sound": "/static/sounds/日本.wav"
+    },
+    {
+        "name": "科技行动",
+        "type": "spell",
+        "quality": "限定",
+        "cost": 6,
+        "description": "将一张科技行动洗入友方卡组，再将一张澎湃力量加入友方手中",
+        "image": "科技行动.png",
+        "sound": "/static/sounds/装甲列车.wav"
+    },
+    {
+        "name": "青少年爆发",
+        "type": "spell",
+        "quality": "限定",
+        "cost": 6,
+        "description": "使一个攻击力最高的友方单位获得奋战和闪击，并将其攻击力和生命值翻倍",
+        "image": "青少年爆发.png",
+        "sound": "/static/sounds/拉伸.wav"
+    },
+    {
+        "name": "消耗战",
+        "type": "spell",
+        "quality": "限定",
+        "cost": 3,
+        "description": "若友方有友方单位, 移除一个敌方单位，友方回合结束时，使其返场，变为2/2",
+        "image": "1773313604121.png",
+        "sound": "/static/sounds/日本.wav"
+    }
+]
