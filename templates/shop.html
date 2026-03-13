@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>商店 - 卡牌游戏</title>
+    <!-- 在此处写入您的商店样式 -->
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            min-height: 100vh;
+            background: linear-gradient(135deg, #1a2a6c, #2c3e50, #3498db);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .shop-container {
+            width: 100%;
+            max-width: 500px;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(10px);
+            border-radius: 30px;
+            padding: 30px 20px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        h1 {
+            font-size: 2em;
+            color: #f1c40f;
+            text-shadow: 0 0 15px rgba(241, 196, 15, 0.5);
+        }
+
+        .back-btn {
+            padding: 10px 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid #f1c40f;
+            border-radius: 50px;
+            color: #f1c40f;
+            text-decoration: none;
+            transition: all 0.3s;
+        }
+
+        .back-btn:hover {
+            background: #f1c40f;
+            color: #1a2a6c;
+        }
+
+        .game-icon {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 20px;
+            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%23f1c40f"><path d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zM1 2v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h12v-2H7.42c-.14 0-.25-.11-.25-.25l.03-.12.9-1.63h7.45c.75 0 1.41-.41 1.75-1.03l3.58-6.49c.08-.14.12-.31.12-.48 0-.55-.45-1-1-1H5.21l-.94-2H1zm16 16c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2 2-.9 2-2-.9-2-2-2z"/></svg>') no-repeat center;
+            background-size: contain;
+            filter: drop-shadow(0 0 15px #f1c40f);
+        }
+
+        .free-card-section {
+            background: linear-gradient(135deg, rgba(241, 196, 15, 0.1), rgba(230, 126, 34, 0.1));
+            border-radius: 20px;
+            padding: 30px 20px;
+            text-align: center;
+            border: 2px solid #f1c40f;
+            box-shadow: 0 0 30px rgba(241, 196, 15, 0.3);
+            margin-bottom: 30px;
+        }
+
+        .free-card-title {
+            font-size: 1.3em;
+            color: #f1c40f;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .free-card {
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 15px;
+            padding: 20px;
+            margin: 20px 0;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .free-card-name {
+            font-size: 2em;
+            font-weight: bold;
+            color: #f1c40f;
+            margin-bottom: 10px;
+            text-shadow: 0 0 10px rgba(241, 196, 15, 0.5);
+        }
+
+        .free-card-info {
+            color: #bdc3c7;
+            margin-bottom: 20px;
+        }
+
+        .timer {
+            font-size: 1.1em;
+            color: #ecf0f1;
+            margin: 15px 0;
+        }
+
+        .timer span {
+            color: #f1c40f;
+            font-weight: bold;
+            font-size: 1.3em;
+        }
+
+        .claim-btn {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(45deg, #f1c40f, #e67e22);
+            border: none;
+            border-radius: 50px;
+            color: white;
+            font-size: 1.2em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 5px 15px rgba(241, 196, 15, 0.3);
+        }
+
+        .claim-btn:hover:not(:disabled) {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(241, 196, 15, 0.5);
+        }
+
+        .claim-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            background: #7f8c8d;
+        }
+
+        .refresh-info {
+            text-align: center;
+            color: #bdc3c7;
+            font-size: 0.9em;
+            margin-top: 20px;
+        }
+
+        .message {
+            margin-top: 15px;
+            padding: 10px;
+            border-radius: 10px;
+            text-align: center;
+            display: none;
+        }
+
+        .message.show {
+            display: block;
+        }
+
+        .message.success {
+            background: rgba(46, 204, 113, 0.2);
+            color: #2ecc71;
+        }
+
+        .message.error {
+            background: rgba(231, 76, 60, 0.2);
+            color: #e74c3c;
+        }
+
+        .shop-footer {
+            text-align: center;
+            margin-top: 20px;
+            color: #bdc3c7;
+            font-size: 0.9em;
+        }
+
+        .quality-tag {
+            display: inline-block;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.9em;
+            margin-top: 10px;
+        }
+
+        .quality-普通 { background: #7f8c8d; }
+        .quality-限定 { background: #9b59b6; }
+        .quality-特殊 { background: #e67e22; }
+        .quality-精英 { background: #f1c40f; color: #1a2a6c; }
+        
+        
+        /* 请将您的商店页面样式粘贴到这里，并确保包含以下新增样式 */
+        .gold-display {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            background: rgba(0,0,0,0.5);
+            padding: 5px 15px;
+            border-radius: 50px;
+            border: 1px solid #f1c40f;
+            float: right;
+        }
+        .gold-display img {
+            width: 24px;
+            height: 24px;
+        }
+        .pack-section {
+            background: rgba(0,0,0,0.3);
+            border-radius: 15px;
+            padding: 20px;
+            margin: 20px 0;
+            border: 1px solid #f1c40f;
+        }
+        .pack-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .pack-price {
+            font-size: 1.5em;
+            color: #f1c40f;
+        }
+        .pack-btn {
+            background: linear-gradient(45deg, #f1c40f, #e67e22);
+            border: none;
+            padding: 10px 30px;
+            border-radius: 50px;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .message {
+            margin-top: 15px;
+            padding: 10px;
+            border-radius: 5px;
+            display: none;
+        }
+        .message.success {
+            background: rgba(46,204,113,0.3);
+            color: #2ecc71;
+            display: block;
+        }
+        .message.error {
+            background: rgba(231,76,60,0.3);
+            color: #e74c3c;
+            display: block;
+        }
+        .back-link {
+            display: inline-block;
+            margin-top: 20px;
+            color: #f1c40f;
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+            <h1>🛒 商店</h1>
+            <div class="gold-display">
+                <img src="{{ url_for('static', filename='images/gold.png') }}" alt="金币">
+                <span id="goldAmount">{{ gold }}</span>
+            </div>
+        </div>
+
+        <!-- 免费卡牌区域 -->
+        <div class="free-card-section" style="margin: 20px 0; padding: 20px; background: rgba(0,0,0,0.3); border-radius: 15px;">
+            <h2>🎁 每日免费卡牌</h2>
+            {% if free_card %}
+                <p>今日免费卡：<strong>{{ free_card.name }}</strong> ({{ free_card.quality }})</p>
+            {% else %}
+                <p>暂无免费卡，请稍后再来</p>
+            {% endif %}
+            <p>下次刷新时间：<span id="refresh-timer" class="timer">计算中...</span></p>
+            {% if free_card %}
+                <button id="claimFreeBtn" class="pack-btn" style="background: #2ecc71;">领取</button>
+            {% endif %}
+        </div>
+
+        <!-- 随机礼包区域 -->
+        <div class="pack-section">
+            <h2>📦 随机礼包</h2>
+            <div class="pack-info">
+                <div>
+                    <p>花费 <span class="pack-price">20金币</span> 获得：</p>
+                    <ul>
+                        <li>1张 普通 卡牌</li>
+                        <li>1张 限定/特殊 卡牌</li>
+                    </ul>
+                </div>
+                <button id="buyPackBtn" class="pack-btn">购买</button>
+            </div>
+            <div id="packMessage" class="message"></div>
+        </div>
+
+        <a href="{{ url_for('main') }}" class="back-link">← 返回主界面</a>
+    </div>
+
+    <script>
+        // 从后端传递的 last_refresh 转为整数
+        const lastRefresh = Math.floor({{ last_refresh }});
+        const refreshInterval = 20 * 60; // 20分钟 = 1200秒
+
+        function updateTimer() {
+            const now = Math.floor(Date.now() / 1000); // 当前时间（整数秒）
+            const nextRefresh = lastRefresh + refreshInterval;
+            const remaining = Math.floor(nextRefresh - now); // 剩余秒数（整数）
+
+            const timerEl = document.getElementById('refresh-timer');
+            if (!timerEl) return;
+
+            if (remaining <= 0) {
+                timerEl.textContent = '现在可刷新';
+                return;
+            }
+
+            const minutes = Math.floor(remaining / 60);
+            const seconds = remaining % 60; // 取余运算结果自然为整数
+            timerEl.textContent = `${minutes}分${seconds}秒后`;
+        }
+
+        // 每秒更新倒计时
+        updateTimer();
+        setInterval(updateTimer, 1000);
+
+        // 领取免费卡
+        document.getElementById('claimFreeBtn')?.addEventListener('click', function() {
+            fetch('/claim_free_card', { method: 'POST' })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        alert('领取成功！');
+                        location.reload(); // 刷新页面更新免费卡状态
+                    } else {
+                        alert('领取失败，请稍后重试');
+                    }
+                });
+        });
+
+        // 购买随机礼包
+        document.getElementById('buyPackBtn').addEventListener('click', function() {
+            const btn = this;
+            const msgDiv = document.getElementById('packMessage');
+            btn.disabled = true;
+            btn.textContent = '购买中...';
+
+            fetch('/purchase_random_pack', { method: 'POST' })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        msgDiv.className = 'message success';
+                        msgDiv.innerHTML = `✅ 购买成功！获得：${data.reward.cards.join('、')}`;
+                        // 更新金币显示
+                        const goldSpan = document.getElementById('goldAmount');
+                        goldSpan.textContent = parseInt(goldSpan.textContent) - 20;
+                    } else {
+                        msgDiv.className = 'message error';
+                        msgDiv.textContent = '❌ ' + data.message;
+                    }
+                })
+                .catch(err => {
+                    msgDiv.className = 'message error';
+                    msgDiv.textContent = '网络错误，请稍后重试';
+                })
+                .finally(() => {
+                    btn.disabled = false;
+                    btn.textContent = '购买';
+                });
+        });
+    </script>
+</body>
+</html>

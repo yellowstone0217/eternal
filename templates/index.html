@@ -1,0 +1,1687 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>卡牌对战游戏 · 整合敌方卡牌显示</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/minion-deploy.css') }}">
+    <style>
+        /* 扇形手牌效果 (原样保留) */
+        .hand-area {
+            display: flex;
+            justify-content: center;
+            position: relative;
+            height: 180px;
+            padding: 0;
+            margin: 20px 0;
+            perspective: 1000px;
+        }
+        
+        .player-hand .card-container {
+            position: absolute;
+            bottom: 0;
+            transition: all 0.3s ease;
+            transform-origin: bottom center;
+        }
+        
+        /* 扇形布局计算（玩家手牌） */
+        .player-hand .card-container:nth-child(1) { transform: rotate(-15deg) translateX(-80px); z-index: 1; }
+        .player-hand .card-container:nth-child(2) { transform: rotate(-7.5deg) translateX(-40px); z-index: 2; }
+        .player-hand .card-container:nth-child(3) { transform: rotate(0deg) translateX(0); z-index: 3; }
+        .player-hand .card-container:nth-child(4) { transform: rotate(7.5deg) translateX(40px); z-index: 4; }
+        .player-hand .card-container:nth-child(5) { transform: rotate(15deg) translateX(80px); z-index: 5; }
+        .player-hand .card-container:nth-child(6) { transform: rotate(22.5deg) translateX(120px); z-index: 6; }
+        .player-hand .card-container:nth-child(7) { transform: rotate(30deg) translateX(160px); z-index: 7; }
+        .player-hand .card-container:nth-child(8) { transform: rotate(37.5deg) translateX(200px); z-index: 8; }
+        .player-hand .card-container:nth-child(9) { transform: rotate(45deg) translateX(240px); z-index: 9; }
+        
+        .player-hand .card-container:hover {
+            transform: rotate(0deg) translateY(-30px) !important;
+            z-index: 100;
+        }
+        
+        /* 敌方手牌扇形（向下展开） */
+        .enemy-hand .card-container {
+            position: absolute;
+            top: 0;
+            transition: all 0.3s ease;
+            transform-origin: top center;
+        }
+        .enemy-hand .card-container:nth-child(1) { transform: rotate(12deg) translateX(-40px); z-index: 1; }
+        .enemy-hand .card-container:nth-child(2) { transform: rotate(6deg) translateX(-20px); z-index: 2; }
+        .enemy-hand .card-container:nth-child(3) { transform: rotate(0deg) translateX(0); z-index: 3; }
+        .enemy-hand .card-container:nth-child(4) { transform: rotate(-6deg) translateX(20px); z-index: 4; }
+        .enemy-hand .card-container:nth-child(5) { transform: rotate(-12deg) translateX(40px); z-index: 5; }
+        .enemy-hand .card-container:nth-child(6) { transform: rotate(-18deg) translateX(60px); z-index: 6; }
+        .enemy-hand .card-container:nth-child(7) { transform: rotate(-24deg) translateX(80px); z-index: 7; }
+        .enemy-hand .card-container:nth-child(8) { transform: rotate(-30deg) translateX(100px); z-index: 8; }
+        .enemy-hand .card-container:nth-child(9) { transform: rotate(-36deg) translateX(120px); z-index: 9; }
+        
+        .enemy-hand .card-container:hover {
+            transform: rotate(0deg) translateY(30px) !important;
+            z-index: 100;
+        }
+        
+        /* 效果标签样式 */
+        .card-effects {
+            display: flex;
+            justify-content: center;
+            gap: 5px;
+            margin-bottom: 5px;
+            flex-wrap: wrap;
+        }
+        
+        .effect-tag {
+            background: rgba(241, 196, 15, 0.2);
+            border: 1px solid #f1c40f;
+            border-radius: 10px;
+            padding: 2px 8px;
+            font-size: 10px;
+            font-weight: bold;
+            color: #f1c40f;
+        }
+        
+        /* 指挥槽样式 */
+        .commander-slot {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            margin-top: 5px;
+        }
+        
+        .slot-point {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #3498db, #8e44ad);
+            border: 2px solid #f1c40f;
+            box-shadow: 0 0 5px rgba(241, 196, 15, 0.5);
+        }
+        
+        .slot-point.empty {
+            background: rgba(52, 73, 94, 0.5);
+            border: 2px dashed #7f8c8d;
+        }
+        
+        /* 游戏主容器样式 */
+        .game-container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: rgba(0, 0, 0, 0.7);
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        }
+        
+        .game-board {
+            display: flex;
+            flex-direction: column;
+            height: 70vh;
+            background: #2c3e50;
+            border-radius: 10px;
+            overflow: hidden;
+            position: relative;
+            border: 3px solid #34495e;
+            margin-bottom: 20px;
+        }
+        
+        .enemy-area, .player-area {
+            display: flex;
+            flex-direction: column;
+            height: 50%;
+            padding: 10px;
+            position: relative;
+        }
+        
+        .player-area {
+            background: rgba(0, 0, 0, 0.2);
+        }
+        
+        .enemy-area {
+            background: rgba(0, 0, 0, 0.3);
+        }
+        
+        .board-area {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            height: 100%;
+            padding: 10px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        
+        .battlefield-divider {
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(to right, transparent, #f1c40f, transparent);
+            transform: translateY(-50%);
+            z-index: 10;
+        }
+        
+        .health-display, .enemy-health-display {
+            position: absolute;
+            top: 20px;
+            background: rgba(0, 0, 0, 0.6);
+            padding: 10px 15px;
+            border-radius: 10px;
+            border: 2px solid #f1c40f;
+            z-index: 20;
+            font-size: 16px;
+            font-weight: bold;
+        }
+        
+        .health-display {
+            left: 20px;
+        }
+        
+        .enemy-health-display {
+            right: 20px;
+        }
+        
+        .card-container {
+            position: relative;
+            display: inline-block;
+            margin: 0 5px;
+            flex-shrink: 0;
+        }
+        
+        .cant-attack-mark {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            width: 25px;
+            height: 25px;
+            background: rgba(231, 76, 60, 0.8);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 18px;
+            z-index: 10;
+        }
+        
+        .action-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 10px;
+            flex-wrap: wrap;
+        }
+        
+        .action-btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 5px;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .play-btn {
+            background: linear-gradient(to right, #2ecc71, #27ae60);
+            color: white;
+        }
+        
+        .attack-btn {
+            background: linear-gradient(to right, #e74c3c, #c0392b);
+            color: white;
+        }
+        
+        .attack-hero-btn {
+            background: linear-gradient(to right, #3498db, #2980b9);
+            color: white;
+        }
+        
+        .action-btn:disabled {
+            background: #7f8c8d;
+            cursor: not-allowed;
+        }
+        
+        .action-btn:hover:not(:disabled) {
+            transform: scale(1.05);
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.7);
+        }
+
+        .modal-content {
+            background: linear-gradient(135deg, #2c3e50, #1a2a6c);
+            margin: 10% auto;
+            padding: 20px;
+            border-radius: 15px;
+            width: 320px;
+            box-shadow: 0 5px 30px rgba(0,0,0,0.5);
+            position: relative;
+            border: 2px solid #f1c40f;
+            color: white;
+        }
+
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .close:hover {
+            color: #f1c40f;
+        }
+
+        #modal-card-image {
+            width: 100%;
+            height: 180px;
+            background-size: cover;
+            background-position: center;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            border: 2px solid #3498db;
+            background-color: #34495e;
+        }
+
+        #modal-card-name {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #f1c40f;
+            text-align: center;
+        }
+        
+        .modal-card-effects {
+            display: flex;
+            justify-content: center;
+            gap: 5px;
+            margin-bottom: 10px;
+            flex-wrap: wrap;
+        }
+        
+        .modal-effect-tag {
+            background: rgba(241, 196, 15, 0.2);
+            border: 1px solid #f1c40f;
+            border-radius: 10px;
+            padding: 3px 10px;
+            font-size: 12px;
+            font-weight: bold;
+            color: #f1c40f;
+        }
+
+        #modal-card-description {
+            text-align: center;
+            margin-bottom: 15px;
+            color: #ecf0f1;
+            min-height: 60px;
+        }
+
+        #modal-card-stats {
+            display: flex;
+            justify-content: space-around;
+            width: 100%;
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+
+        .stat-circle {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            font-weight: bold;
+        }
+
+        .attack-circle {
+            background: rgba(231, 76, 60, 0.2);
+            border: 2px solid #e74c3c;
+        }
+
+        .health-circle {
+            background: rgba(46, 204, 113, 0.2);
+            border: 2px solid #2ecc71;
+        }
+
+        .card-cost {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            background: #f39c12;
+            color: white;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+        }
+        
+        .warning {
+            color: #e74c3c;
+            font-weight: bold;
+            text-align: center;
+            margin-top: 10px;
+        }
+        
+        .card {
+            width: 100px;
+            height: 140px;
+            background: linear-gradient(135deg, #3498db, #8e44ad);
+            border-radius: 10px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 8px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            border: 2px solid #f1c40f;
+            transition: all 0.3s ease;
+        }
+        
+        .card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.4);
+        }
+        
+        .card.enemy {
+            background: linear-gradient(135deg, #e74c3c, #c0392b);
+        }
+        
+        .card.player {
+            background: linear-gradient(135deg, #2ecc71, #27ae60);
+        }
+        
+        .card-back {
+            background: linear-gradient(45deg, #9b59b6, #3498db);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid #ecf0f1;
+        }
+        
+        .card-back::before {
+            content: "?";
+            font-size: 30px;
+            color: white;
+            font-weight: bold;
+        }
+        
+        .card-image {
+            width: 100%;
+            height: 50px;
+            background-size: cover;
+            background-position: center;
+            border-radius: 5px;
+            margin-bottom: 3px;
+            background-color: #34495e;
+        }
+        
+        .card-name {
+            font-size: 12px;
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 3px;
+            color: #fff;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.7);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        .card-stats {
+            display: flex;
+            justify-content: space-between;
+            font-size: 14px;
+            font-weight: bold;
+        }
+        
+        .attack {
+            color: #e74c3c;
+        }
+        
+        .health {
+            color: #2ecc71;
+        }
+        
+        #game-message {
+            font-size: 18px;
+            font-weight: bold;
+            color: #f1c40f;
+            text-align: center;
+            height: 30px;
+            margin-top: 10px;
+        }
+        
+        .attack-mode .player-board .card {
+            cursor: pointer;
+        }
+        
+        .attack-mode .player-board .card.selected {
+            box-shadow: 0 0 0 3px #f1c40f, 0 0 20px #f1c40f;
+            transform: translateY(-10px);
+        }
+        
+        .attack-mode .enemy-board .card {
+            cursor: pointer;
+        }
+        
+        .attack-mode .enemy-board .card.targetable {
+            box-shadow: 0 0 0 3px #3498db, 0 0 15px #3498db;
+            transform: translateY(-5px);
+        }
+
+        /* ========== 攻击动画 ========== */
+        
+        /* 子弹容器 */
+        .attack-bullets {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 9999;
+        }
+
+        /* 子弹样式 */
+        .bullet {
+            position: absolute;
+            width: 8px;
+            height: 25px;
+            background: linear-gradient(45deg, #f1c40f, #e67e22, #f39c12);
+            border-radius: 4px;
+            box-shadow: 0 0 15px #f1c40f, 0 0 30px #e67e22;
+            transform-origin: center;
+            opacity: 0.95;
+            animation: bulletFly 0.3s ease-out forwards;
+        }
+
+        /* 子弹飞行动画 */
+        @keyframes bulletFly {
+            0% {
+                transform: translate(0, 0) rotate(0deg) scale(1);
+                opacity: 0.95;
+            }
+            100% {
+                transform: translate(var(--target-x, 300px), var(--target-y, 0)) rotate(15deg) scale(0.6);
+                opacity: 0.1;
+            }
+        }
+
+        /* 攻击者后坐力动画 */
+        .card.attacking {
+            animation: attackRecoil 0.2s ease-out !important;
+            position: relative;
+            z-index: 100;
+        }
+
+        @keyframes attackRecoil {
+            0% { transform: translateX(0); }
+            30% { transform: translateX(-15px); }
+            70% { transform: translateX(5px); }
+            100% { transform: translateX(0); }
+        }
+
+        /* 被攻击目标闪烁 */
+        .card.targeted {
+            animation: targetFlash 0.3s ease-out !important;
+        }
+
+        @keyframes targetFlash {
+            0% { filter: brightness(1); box-shadow: 0 0 0 0 #f1c40f; }
+            30% { filter: brightness(2) drop-shadow(0 0 10px #f1c40f); box-shadow: 0 0 20px 5px #f1c40f; }
+            70% { filter: brightness(1.3); box-shadow: 0 0 10px 2px #f1c40f; }
+            100% { filter: brightness(1); box-shadow: 0 0 0 0 #f1c40f; }
+        }
+
+        /* 敌方英雄被攻击时的效果 */
+        .enemy-health-display.targeted {
+            animation: heroFlash 0.3s ease-out !important;
+        }
+
+        @keyframes heroFlash {
+            0% { background-color: rgba(231, 76, 60, 0.5); transform: scale(1); }
+            50% { background-color: rgba(241, 196, 15, 0.8); transform: scale(1.2); }
+            100% { background-color: rgba(0, 0, 0, 0.6); transform: scale(1); }
+        }
+
+        /* 手机竖屏优化：手牌向外移动，随从区域可左右滑动 */
+        @media (max-width: 600px) and (orientation: portrait) {
+            /* 玩家手牌向下移动，敌方手牌向上移动 */
+            .player-area .hand-area {
+                transform: translateY(20px);
+            }
+            .enemy-area .hand-area {
+                transform: translateY(-20px);
+            }
+            /* 随从区域向外移动并启用水平滚动 */
+            .player-area .board-area {
+                transform: translateY(20px);
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+                justify-content: flex-start;
+                flex-wrap: nowrap;
+                padding: 10px 15px;
+                scrollbar-width: thin;
+            }
+            .enemy-area .board-area {
+                transform: translateY(-20px);
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+                justify-content: flex-start;
+                flex-wrap: nowrap;
+                padding: 10px 15px;
+                scrollbar-width: thin;
+            }
+            /* 确保卡片在滚动容器内不压缩 */
+            .board-area .card-container {
+                flex-shrink: 0;
+            }
+            
+            /* 手牌高度调整 */
+            .hand-area {
+                height: 150px;
+            }
+            
+            /* 卡片尺寸缩小 */
+            .card {
+                width: 80px;
+                height: 112px;
+            }
+            .card-image {
+                height: 35px;
+            }
+            .card-name {
+                font-size: 10px;
+            }
+            .card-stats {
+                font-size: 12px;
+            }
+            .effect-tag {
+                font-size: 8px;
+                padding: 1px 4px;
+            }
+        }
+        
+        /* ========== 新增：敌方卡牌显示样式（从1.txt整合） ========== */
+        #enemy-card-display {
+            position: fixed;
+            left: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 120px;
+            height: 168px;
+            background: rgba(0,0,0,0.9);
+            border: 2px solid #ff4444;
+            border-radius: 10px;
+            padding: 10px;
+            color: white;
+            text-align: center;
+            opacity: 0;
+            transition: opacity 0.3s;
+            pointer-events: none;
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 0 20px rgba(255,68,68,0.5);
+        }
+        
+        @keyframes fadeOutLeft {
+            0% { opacity: 1; left: 20px; transform: translateY(-50%) scale(1); }
+            70% { opacity: 1; left: 20px; transform: translateY(-50%) scale(1); }
+            100% { opacity: 0; left: -150px; transform: translateY(-50%) scale(0.8); }
+        }
+        
+        .enemy-card-animation {
+            animation: fadeOutLeft 2s forwards !important;
+        }
+        
+        /* 左侧技能面板（原样保留） */
+        .skill-panel-toggle {
+            position: fixed;
+            left: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #3498db, #8e44ad);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 1000;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            transition: all 0.3s;
+        }
+
+        .skill-panel-toggle:hover {
+            transform: translateY(-50%) scale(1.1);
+            box-shadow: 0 6px 15px rgba(241, 196, 15, 0.5);
+        }
+
+        .hamburger {
+            width: 24px;
+            height: 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .hamburger span {
+            width: 100%;
+            height: 3px;
+            background: white;
+            border-radius: 3px;
+            transition: all 0.3s;
+        }
+
+        .skill-panel {
+            position: fixed;
+            left: -350px;
+            top: 0;
+            width: 300px;
+            height: 100vh;
+            background: linear-gradient(135deg, #2c3e50, #1a2a6c);
+            border-right: 2px solid #f1c40f;
+            box-shadow: 5px 0 30px rgba(0,0,0,0.5);
+            z-index: 1001;
+            transition: left 0.3s ease;
+            color: white;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .skill-panel.open {
+            left: 0;
+        }
+
+        .skill-panel-header {
+            padding: 20px;
+            border-bottom: 2px solid #f1c40f;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .skill-panel-header h3 {
+            margin: 0;
+            color: #f1c40f;
+            font-size: 18px;
+        }
+
+        .close-panel {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+            transition: color 0.3s;
+        }
+
+        .close-panel:hover {
+            color: #f1c40f;
+        }
+
+        .skill-list {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+        }
+
+        .skill-item {
+            background: rgba(52, 73, 94, 0.6);
+            border: 1px solid #3498db;
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 10px;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .skill-item-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 5px;
+            font-size: 14px;
+        }
+
+        .skill-name {
+            color: #f1c40f;
+            font-weight: bold;
+        }
+
+        .skill-round {
+            color: #3498db;
+        }
+
+        .skill-description {
+            font-size: 12px;
+            color: #ecf0f1;
+            margin-top: 5px;
+        }
+
+        .skill-empty {
+            text-align: center;
+            color: #7f8c8d;
+            padding: 20px;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <h1>卡牌对战游戏</h1>
+        
+        <div class="game-board">
+            <div class="health-display">
+                我方生命: <span id="player-health">30</span>
+                <div class="commander-slot" id="commander-slot-display"></div>
+            </div>
+            <div class="enemy-health-display">
+                敌方生命: <span id="enemy-health">30</span>
+            </div>
+            
+            <div class="enemy-area">
+                <div class="hand-area enemy-hand" id="enemy-hand"></div>
+                <div class="board-area" id="enemy-board"></div>
+            </div>
+            
+            <div class="battlefield-divider"></div>
+            
+            <div class="player-area">
+                <div class="board-area" id="player-board"></div>
+                <div class="hand-area player-hand" id="player-hand"></div>
+            </div>
+        </div>
+        
+        <div class="action-buttons">
+            <button id="play-selected-btn" class="action-btn play-btn" disabled>打出选中卡牌</button>
+            <button id="end-turn-btn">结束回合</button>
+            <button id="surrender-btn">投降</button>
+        </div>
+        
+        <div id="game-message"></div>
+    </div>
+    
+    <!-- 子弹容器 -->
+    <div class="attack-bullets" id="attack-bullets"></div>
+    
+    <!-- 卡牌详情模态框 -->
+    <div id="card-modal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <div class="card-cost" id="modal-card-cost">0</div>
+            <div id="modal-card-image"></div>
+            <div id="modal-card-name"></div>
+            <div class="modal-card-effects" id="modal-card-effects"></div>
+            <div id="modal-card-description"></div>
+            <div id="modal-card-stats">
+                <div>
+                    <div>攻击力</div>
+                    <div class="stat-circle attack-circle">
+                        <span id="modal-card-attack">0</span>
+                    </div>
+                </div>
+                <div>
+                    <div>生命值</div>
+                    <div class="stat-circle health-circle">
+                        <span id="modal-card-health">0</span>
+                    </div>
+                </div>
+            </div>
+            <div class="action-buttons">
+                <button id="modal-play-btn" class="action-btn play-btn">打出</button>
+                <button id="modal-attack-btn" class="action-btn attack-btn" disabled>攻击随从</button>
+                <button id="modal-attack-hero-btn" class="action-btn attack-hero-btn" disabled>攻击英雄</button>
+            </div>
+            <div class="warning" id="modal-card-warning"></div>
+        </div>
+    </div>
+    
+    <!-- 左侧技能查看面板 -->
+    <div class="skill-panel-toggle" id="skill-panel-toggle">
+        <div class="hamburger">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+    </div>
+
+    <div class="skill-panel" id="skill-panel">
+        <div class="skill-panel-header">
+            <h3>敌方使用技能</h3>
+            <button class="close-panel" id="close-skill-panel">&times;</button>
+        </div>
+        <div class="skill-list" id="skill-list">
+            <div class="skill-empty">暂无技能记录</div>
+        </div>
+    </div>
+    
+    <!-- ========== 敌方卡牌显示元素（从1.txt添加） ========== -->
+    <div id="enemy-card-display">
+        <div id="enemy-card-name" style="font-size: 14px; font-weight: bold; margin-bottom: 5px;"></div>
+        <div id="enemy-card-cost" style="font-size: 12px; color: #ffaa00;"></div>
+        <div id="enemy-card-type" style="font-size: 12px; margin-top: 5px;"></div>
+    </div>
+
+    <!-- 脚本引入 -->
+    
+    <script src="{{ url_for('static', filename='js/camellia/sound-player.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/camellia/spell-reveal.js') }}"></script>
+    <script src="https://cdn.socket.io/4.5.0/socket.io.min.js"></script>
+    <script src="{{ url_for('static', filename='js/game.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/camellia/good.js') }}"></script>
+    
+    <!-- 攻击动画本地播放脚本 (保持不变) -->
+    <script>
+    (function() {
+        console.log('攻击动画本地播放脚本启动...');
+        
+        const checkInterval = setInterval(function() {
+            if (typeof window.executeAttack !== 'undefined') {
+                clearInterval(checkInterval);
+                console.log('找到 executeAttack 函数，开始修补...');
+                
+                const originalExecuteAttack = window.executeAttack;
+                
+                window.executeAttack = function(attackerIndex, targetIndex, targetType) {
+                    console.log('攻击执行 - 本地播放动画:', attackerIndex, targetIndex, targetType);
+                    playLocalAnimation(attackerIndex, targetIndex, targetType);
+                    return originalExecuteAttack(attackerIndex, targetIndex, targetType);
+                };
+                
+                console.log('攻击动画本地播放已启用');
+            }
+        }, 500);
+        
+        function playLocalAnimation(attackerIndex, targetIndex, targetType) {
+            const playerBoard = document.getElementById('player-board');
+            const enemyBoard = document.getElementById('enemy-board');
+            const enemyHealth = document.querySelector('.enemy-health-display');
+            
+            if (!playerBoard || !enemyBoard) {
+                console.error('找不到战场元素');
+                return;
+            }
+            
+            let attackerCard = null;
+            if (playerBoard.children[attackerIndex]) {
+                attackerCard = playerBoard.children[attackerIndex].querySelector('.card');
+            }
+            
+            if (!attackerCard) {
+                console.error('找不到攻击者卡牌');
+                return;
+            }
+            
+            attackerCard.classList.add('attacking');
+            
+            let targetElement = null;
+            
+            if (targetType === 'hero' || targetIndex === null || targetIndex === undefined) {
+                targetElement = enemyHealth;
+            } else {
+                if (enemyBoard.children[targetIndex]) {
+                    targetElement = enemyBoard.children[targetIndex].querySelector('.card');
+                }
+            }
+            
+            if (targetElement) {
+                targetElement.classList.add('targeted');
+            }
+            
+            createBullets(attackerCard, targetElement);
+            
+            setTimeout(function() {
+                attackerCard.classList.remove('attacking');
+                if (targetElement) {
+                    targetElement.classList.remove('targeted');
+                }
+            }, 400);
+        }
+        
+        function createBullets(attackerEl, targetEl) {
+            const bulletContainer = document.getElementById('attack-bullets');
+            if (!bulletContainer || !attackerEl || !targetEl) return;
+            
+            const attackerRect = attackerEl.getBoundingClientRect();
+            const targetRect = targetEl.getBoundingClientRect();
+            
+            const startX = attackerRect.left + attackerRect.width / 2;
+            const startY = attackerRect.top + attackerRect.height / 2;
+            const endX = targetRect.left + targetRect.width / 2;
+            const endY = targetRect.top + targetRect.height / 2;
+            
+            const angle = Math.atan2(endY - startY, endX - startX);
+            const bulletCount = 4 + Math.floor(Math.random() * 2);
+            
+            for (let i = 0; i < bulletCount; i++) {
+                const offsetX = (Math.random() - 0.5) * 40;
+                const offsetY = (Math.random() - 0.5) * 40;
+                const bulletStartX = startX + offsetX;
+                const bulletStartY = startY + offsetY;
+                const bulletEndX = endX + (Math.random() - 0.5) * 30;
+                const bulletEndY = endY + (Math.random() - 0.5) * 30;
+                
+                const bullet = document.createElement('div');
+                bullet.className = 'bullet';
+                bullet.style.left = bulletStartX + 'px';
+                bullet.style.top = bulletStartY + 'px';
+                bullet.style.transform = `rotate(${angle}rad)`;
+                bullet.style.setProperty('--target-x', (bulletEndX - bulletStartX) + 'px');
+                bullet.style.setProperty('--target-y', (bulletEndY - bulletStartY) + 'px');
+                bullet.style.animationDelay = (i * 0.05) + 's';
+                
+                bulletContainer.appendChild(bullet);
+                
+                setTimeout(function() {
+                    if (bullet.parentNode) {
+                        bullet.remove();
+                    }
+                }, 350 + i * 50);
+            }
+        }
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            const bulletContainer = document.getElementById('attack-bullets');
+            if (!bulletContainer) return;
+            
+            const observer = new MutationObserver(function(mutations) {
+                mutations.forEach(function(mutation) {
+                    if (mutation.type === 'attributes' && mutation.attributeName === 'class') {
+                        const target = mutation.target;
+                        if (target.classList && target.classList.contains('attacking')) {
+                            setTimeout(function() {
+                                const targetEl = document.querySelector('.targeted');
+                                if (targetEl) {
+                                    createBullets(target, targetEl);
+                                }
+                            }, 20);
+                        }
+                    }
+                });
+            });
+            
+            observer.observe(document.body, {
+                subtree: true,
+                attributes: true,
+                attributeFilter: ['class']
+            });
+        });
+    })();
+    </script>
+    
+    <!-- 技能记录猴子补丁 (保留) 并整合 showEnemyCard -->
+    <script>
+    (function() {
+        console.log('🎯 技能记录猴子补丁 + 敌方卡牌显示整合...');
+        
+        // 技能记录数组
+        let skillRecords = [];
+        let roundCount = 1;
+        let lastMessage = '';
+        let processedMessages = new Set(); // 防止重复记录
+        
+        // 等待游戏状态更新
+        function waitForGameState() {
+            if (typeof window.gameStateData !== 'undefined') {
+                console.log('✅ 检测到游戏状态，开始监控技能使用');
+                startMonitoring();
+            } else {
+                setTimeout(waitForGameState, 500);
+            }
+        }
+        
+        function startMonitoring() {
+            // 创建技能记录函数
+            window.recordEnemySpell = function(card) {
+                if (!card) return;
+                
+                console.log('📝 记录敌方技能:', card);
+                
+                // 获取当前回合数
+                if (window.gameStateData && window.gameStateData.round_count) {
+                    roundCount = window.gameStateData.round_count;
+                }
+                
+                const record = {
+                    name: card.name || '未知技能',
+                    description: card.description || '暂无描述',
+                    round: roundCount,
+                    timestamp: Date.now()
+                };
+                
+                skillRecords.unshift(record);
+                
+                // 只保留最近20条
+                if (skillRecords.length > 20) {
+                    skillRecords.pop();
+                }
+                
+                updateSkillList();
+            };
+            
+            // 创建更新函数
+            window.updateSkillList = updateSkillList;
+            
+            // 拦截游戏状态更新
+            const originalUpdateGameState = window.updateGameState;
+            if (typeof originalUpdateGameState === 'function') {
+                window.updateGameState = function() {
+                    const result = originalUpdateGameState.apply(this, arguments);
+                    
+                    setTimeout(() => {
+                        checkForSpellUsage();
+                    }, 100);
+                    
+                    return result;
+                };
+            }
+            
+            // 拦截 fetch 请求
+            const originalFetch = window.fetch;
+            window.fetch = function() {
+                const url = arguments[0];
+                const options = arguments[1] || {};
+                
+                // 拦截法术相关请求
+                if (typeof url === 'string') {
+                    if ((url.includes('/play_card/') || url.includes('/play_spell_target/')) && options.method === 'POST') {
+                        return originalFetch.apply(this, arguments).then(response => {
+                            response.clone().json().then(data => {
+                                if (data.success) {
+                                    console.log('🔮 检测到法术释放成功');
+                                    // 如果返回了used_card，显示敌方卡牌
+                                    if (data.used_card) {
+                                        showEnemyCard(data.used_card);
+                                    }
+                                    setTimeout(() => {
+                                        checkForSpellUsage();
+                                    }, 500);
+                                }
+                            }).catch(() => {});
+                            return response;
+                        });
+                    }
+                }
+                
+                return originalFetch.apply(this, arguments);
+            };
+            
+            // 每2秒检查一次游戏消息
+            setInterval(checkForSpellUsage, 2000);
+            
+            // 从游戏消息中检测法术使用
+            function checkForSpellUsage() {
+                const gameState = window.gameStateData;
+                if (!gameState) return;
+                
+                // 更新回合数
+                if (gameState.round_count) {
+                    roundCount = gameState.round_count;
+                }
+                
+                const message = gameState.message || '';
+                if (!message || message === lastMessage) return;
+                
+                // 检查是否包含技能关键词
+                const spellKeywords = ['技能', '法术', '使用', '抵抗'];
+                const hasSpellKeyword = spellKeywords.some(keyword => message.includes(keyword));
+                
+                if (hasSpellKeyword) {
+                    // 创建消息指纹避免重复
+                    const messageFingerprint = message + '_' + roundCount;
+                    if (processedMessages.has(messageFingerprint)) {
+                        return;
+                    }
+                    processedMessages.add(messageFingerprint);
+                    
+                    // 限制集合大小
+                    if (processedMessages.size > 50) {
+                        const iterator = processedMessages.values();
+                        for (let i = 0; i < 10; i++) {
+                            processedMessages.delete(iterator.next().value);
+                        }
+                    }
+                    
+                    // 判断是否是敌方使用的技能
+                    const currentUser = sessionStorage.getItem('user') || '';
+                    const isMyTurn = (gameState.current_player === currentUser);
+                    
+                    // 如果不是我的回合，或者消息明确提到敌方
+                    if (!isMyTurn || message.includes('敌方')) {
+                        console.log('🎯 检测到敌方使用技能:', message);
+                        
+                        // 提取技能名称
+                        let spellName = '敌方技能';
+                        const nameMatch = message.match(/[使用打出]?\s*([^，。\s]+技能|[^，。\s]+法术|[^，。\s]+)/);
+                        if (nameMatch && nameMatch[1]) {
+                            spellName = nameMatch[1].trim();
+                        }
+                        
+                        // 创建技能卡牌对象
+                        const spellCard = {
+                            name: spellName,
+                            description: message,
+                            type: 'spell',
+                            cost: '?'
+                        };
+                        
+                        window.recordEnemySpell(spellCard);
+                        // 同时显示敌方卡牌动画（技能）
+                        showEnemyCard(spellCard);
+                    }
+                }
+                
+                lastMessage = message;
+            }
+            
+            // 添加测试数据（延迟2秒后添加，方便测试）
+            setTimeout(() => {
+                console.log('🧪 添加测试技能数据...');
+                window.recordEnemySpell({
+                    name: '测试技能',
+                    description: '猴子补丁添加的测试技能（如果看到这条，说明补丁工作正常）',
+                    effect: ['测试']
+                });
+            }, 3000);
+        }
+        
+        // 更新技能列表显示
+        function updateSkillList() {
+            const skillList = document.getElementById('skill-list');
+            if (!skillList) return;
+            
+            if (skillRecords.length === 0) {
+                skillList.innerHTML = '<div class="skill-empty">暂无技能记录</div>';
+                return;
+            }
+            
+            skillList.innerHTML = '';
+            skillRecords.forEach(record => {
+                const item = document.createElement('div');
+                item.className = 'skill-item';
+                item.innerHTML = `
+                    <div class="skill-item-header">
+                        <span class="skill-name">${record.name}</span>
+                        <span class="skill-round">第${record.round}回合</span>
+                    </div>
+                    <div class="skill-description">${record.description}</div>
+                `;
+                skillList.appendChild(item);
+            });
+        }
+        
+        // 启动监控
+        waitForGameState();
+        
+        // 初始化面板点击事件
+        document.addEventListener('DOMContentLoaded', function() {
+            const toggleBtn = document.getElementById('skill-panel-toggle');
+            const panel = document.getElementById('skill-panel');
+            const closeBtn = document.getElementById('close-skill-panel');
+            
+            if (toggleBtn && panel) {
+                toggleBtn.addEventListener('click', () => {
+                    panel.classList.toggle('open');
+                });
+            }
+            
+            if (closeBtn && panel) {
+                closeBtn.addEventListener('click', () => {
+                    panel.classList.remove('open');
+                });
+            }
+            
+            document.addEventListener('click', (e) => {
+                if (panel && panel.classList.contains('open')) {
+                    if (!panel.contains(e.target) && !toggleBtn.contains(e.target)) {
+                        panel.classList.remove('open');
+                    }
+                }
+            });
+        });
+    })();
+    
+    /* ========== 从1.txt整合的 showEnemyCard 函数 (全局可用) ========== */
+    function showEnemyCard(card) {
+        const display = document.getElementById('enemy-card-display');
+        const nameEl = document.getElementById('enemy-card-name');
+        const costEl = document.getElementById('enemy-card-cost');
+        const typeEl = document.getElementById('enemy-card-type');
+        
+        nameEl.textContent = card.name || '未知卡牌';
+        costEl.textContent = '费用: ' + (card.cost || '?');
+        typeEl.textContent = card.type === 'spell' ? '技能牌' : (card.type === 'minion' ? '随从牌' : '卡牌');
+        
+        // 重置动画
+        display.classList.remove('enemy-card-animation');
+        void display.offsetWidth; // 强制重绘
+        display.style.opacity = '1';
+        display.classList.add('enemy-card-animation');
+        
+        // 动画结束后隐藏
+        setTimeout(() => {
+            display.style.opacity = '0';
+            display.classList.remove('enemy-card-animation');
+        }, 1900);
+    }
+
+    // 额外：如果在原有的playCard成功回调中需要手动调用，可以在这里为全局函数留一个入口
+    // 例如在 game.js 的 playCard 的 fetch.then 里面可以调用 showEnemyCard(data.used_card)
+    // 但由于我们已拦截fetch并自动调用，此处不需要额外修改。如果游戏逻辑有其他入口，可统一使用此函数。
+    </script>
+    <script src="{{ url_for('static', filename='js/skill-panel.js') }}"></script>
+
+<style>
+.discovery-content {
+    width: 700px;
+    max-width: 90%;
+    background: linear-gradient(135deg, #2c3e50, #1a2a6c);
+    border: 3px solid #f1c40f;
+    border-radius: 20px;
+    padding: 20px;
+}
+
+.discovery-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+    border-bottom: 2px solid #f1c40f;
+    padding-bottom: 10px;
+}
+
+.discovery-header h2 {
+    color: #f1c40f;
+    margin: 0;
+    font-size: 24px;
+    text-shadow: 0 0 10px rgba(241, 196, 15, 0.5);
+}
+
+.close-discovery {
+    color: #aaa;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: color 0.3s;
+}
+
+.close-discovery:hover {
+    color: #f1c40f;
+}
+
+.discovery-subtitle {
+    text-align: center;
+    color: #ecf0f1;
+    margin-bottom: 20px;
+    font-size: 16px;
+}
+
+.discovery-cards {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    flex-wrap: wrap;
+    padding: 10px;
+}
+
+.discovery-card {
+    width: 160px;
+    background: linear-gradient(135deg, #3498db, #8e44ad);
+    border-radius: 15px;
+    padding: 15px 10px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border: 2px solid #f1c40f;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    position: relative;
+    animation: cardFloat 0.5s ease-out;
+}
+
+.discovery-card:hover {
+    transform: translateY(-20px) scale(1.05);
+    box-shadow: 0 15px 30px rgba(241, 196, 15, 0.4);
+    border-color: #fff;
+}
+
+.discovery-card.selected {
+    transform: translateY(-20px) scale(1.05);
+    border-color: #2ecc71;
+    box-shadow: 0 0 20px #2ecc71;
+}
+
+@keyframes cardFloat {
+    0% {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.discovery-card:nth-child(1) { animation-delay: 0.1s; }
+.discovery-card:nth-child(2) { animation-delay: 0.2s; }
+.discovery-card:nth-child(3) { animation-delay: 0.3s; }
+
+.discovery-card-image {
+    width: 100%;
+    height: 100px;
+    background-size: cover;
+    background-position: center;
+    border-radius: 10px;
+    margin-bottom: 10px;
+    border: 2px solid #fff;
+}
+
+.discovery-card-name {
+    font-size: 16px;
+    font-weight: bold;
+    text-align: center;
+    color: #fff;
+    margin-bottom: 5px;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.7);
+}
+
+.discovery-card-cost {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    background: #f39c12;
+    color: white;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 16px;
+    border: 2px solid #fff;
+}
+
+.discovery-card-stats {
+    display: flex;
+    justify-content: space-around;
+    margin-top: 10px;
+    font-size: 14px;
+    font-weight: bold;
+}
+
+.discovery-card-attack {
+    color: #e74c3c;
+    background: rgba(0, 0, 0, 0.3);
+    padding: 3px 8px;
+    border-radius: 10px;
+}
+
+.discovery-card-health {
+    color: #2ecc71;
+    background: rgba(0, 0, 0, 0.3);
+    padding: 3px 8px;
+    border-radius: 10px;
+}
+
+.discovery-card-quality {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    font-size: 10px;
+    padding: 2px 6px;
+    border-radius: 10px;
+    background: rgba(0, 0, 0, 0.6);
+    color: #f1c40f;
+    border: 1px solid #f1c40f;
+}
+
+.discovery-card-type {
+    font-size: 10px;
+    text-align: center;
+    color: #ecf0f1;
+    margin-top: 5px;
+}
+
+.discovery-card-description {
+    font-size: 10px;
+    text-align: center;
+    color: #bdc3c7;
+    margin-top: 5px;
+    height: 30px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.discovery-confirm-btn {
+    display: block;
+    width: 200px;
+    margin: 20px auto 0;
+    padding: 10px;
+    background: linear-gradient(to right, #2ecc71, #27ae60);
+    color: white;
+    border: none;
+    border-radius: 25px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.discovery-confirm-btn:hover:not(:disabled) {
+    transform: scale(1.05);
+    box-shadow: 0 0 15px #2ecc71;
+}
+
+.discovery-confirm-btn:disabled {
+    background: #7f8c8d;
+    cursor: not-allowed;
+    opacity: 0.5;
+}
+
+.discovery-timer {
+    text-align: center;
+    color: #f1c40f;
+    margin-top: 10px;
+    font-size: 14px;
+}
+
+/* ========== 消耗战动画 ========== */
+@keyframes consume-remove {
+    0% {
+        transform: scale(1) translateX(0);
+        opacity: 1;
+        filter: brightness(1);
+    }
+    30% {
+        transform: scale(1.5) translateX(-20px);
+        opacity: 0.9;
+        filter: brightness(1.5);
+    }
+    60% {
+        transform: scale(0.8) translateX(-100px);
+        opacity: 0.5;
+        filter: brightness(2);
+    }
+    100% {
+        transform: scale(0) translateX(-200px);
+        opacity: 0;
+        filter: brightness(3);
+    }
+}
+
+.consume-remove-animation {
+    animation: consume-remove 1.2s ease-out forwards;
+    position: relative;
+    z-index: 1000;
+    pointer-events: none;
+}
+
+/* ========== 返场动画 ========== */
+@keyframes consume-return {
+    0% {
+        transform: scale(0) translateX(200px) rotate(180deg);
+        opacity: 0;
+        filter: blur(10px);
+    }
+    50% {
+        transform: scale(1.2) translateX(0) rotate(0deg);
+        opacity: 0.8;
+        filter: blur(0);
+    }
+    100% {
+        transform: scale(1) translateX(0);
+        opacity: 1;
+    }
+}
+
+.consume-return-animation {
+    animation: consume-return 0.8s ease-out forwards;
+    position: relative;
+    z-index: 1000;
+}
+
+/* ========== 残影效果 ========== */
+@keyframes afterimage {
+    0% {
+        opacity: 0.8;
+        transform: scale(1) translateX(0);
+    }
+    100% {
+        opacity: 0;
+        transform: scale(0.5) translateX(-100px);
+    }
+}
+
+.consume-afterimage {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background: inherit;
+    border-radius: inherit;
+    animation: afterimage 0.5s ease-out forwards;
+    pointer-events: none;
+    z-index: 999;
+}
+
+/* ========== 粒子效果 ========== */
+.consume-particle {
+    position: absolute;
+    width: 8px;
+    height: 8px;
+    background: rgba(255, 215, 0, 0.8);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 1001;
+    box-shadow: 0 0 10px gold;
+}
+
+@keyframes particle-fly {
+    0% {
+        transform: translate(0, 0) scale(1);
+        opacity: 1;
+    }
+    100% {
+        transform: translate(var(--tx), var(--ty)) scale(0);
+        opacity: 0;
+    }
+}
+
+/* ========== 闪光效果 ========== */
+@keyframes consume-flash {
+    0% {
+        box-shadow: 0 0 0 rgba(255, 215, 0, 0);
+    }
+    50% {
+        box-shadow: 0 0 50px rgba(255, 215, 0, 0.8);
+    }
+    100% {
+        box-shadow: 0 0 0 rgba(255, 215, 0, 0);
+    }
+}
+
+.consume-flash {
+    animation: consume-flash 0.6s ease-out;
+}
+</style>
+<!-- 在游戏界面的JavaScript部分添加 -->
+<script>
+// ========== Socket.io 监听消耗战动画 ==========
+socket.on('consume_animation', function(data) {
+    console.log('收到消耗战动画:', data);
+    
+    // 找到对应的卡片元素
+    const owner = data.owner; // 'player' 或 'enemy'
+    const index = data.index;
+    const unitName = data.unit;
+    
+    let container;
+    if (owner === 'player') {
+        container = document.querySelector('.player-board');
+    } else {
+        container = document.querySelector('.enemy-board');
+    }
+    
+    if (container) {
+        const cards = container.querySelectorAll('.card');
+        if (cards[index]) {
+            playConsumeAnimation(cards[index], unitName, owner, index);
+        }
+    }
+});
+
+// ========== Socket.io 监听返场动画 ==========
+socket.on('return_animation', function(data) {
+    console.log('收到返场动画:', data);
+    
+    const owner = data.owner;
+    const cardData = data.card;
+    const position = data.position;
+    
+    let container;
+    if (owner === 'player') {
+        container = document.querySelector('.player-board');
+    } else {
+        container = document.querySelector('.enemy-board');
+    }
+    
+    if (container) {
+        playReturnAnimation(container, cardData, position);
+    }
+});
+</script>
+</body>
+</html>

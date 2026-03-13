@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+    <title>组卡编辑 - 卡牌游戏</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/deck.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>⚔️ 编辑卡组 ⚔️</h1>
+
+        <div class="deck-header">
+            <label for="deck-name">卡组名称：</label>
+            <input type="text" id="deck-name" placeholder="例如：我的快攻" value="">
+
+            <label for="deck-select">选择已有：</label>
+            <select id="deck-select">
+                <option value="">-- 加载卡组 --</option>
+                {% for deck in decks %}
+                <option value="{{ deck.name }}">{{ deck.name }}</option>
+                {% endfor %}
+            </select>
+
+            <div class="deck-actions">
+                <button id="load-deck-btn" disabled>📂 加载</button>
+                <button id="delete-deck-btn" disabled class="delete-btn">🗑️ 删除</button>
+                <button id="clear-deck-btn" class="clear-btn">🧹 清空</button>
+            </div>
+        </div>
+
+        <div class="main-panel">
+            <!-- 可用卡牌库 -->
+            <div class="available-cards">
+                <h2>📦 你的卡牌库</h2>
+                <div class="card-grid" id="card-grid">
+                    <!-- 由JS动态渲染 -->
+                </div>
+            </div>
+
+            <!-- 当前卡组 -->
+            <div class="current-deck">
+                <h2>📋 当前卡组 (<span id="deck-count">0</span>/<span id="deck-size">{{ deck_size }}</span>)</h2>
+                <ul class="deck-list" id="deck-list">
+                    <!-- 动态插入 -->
+                </ul>
+                <div class="deck-stats" id="deck-stats">
+                    点击卡牌右上角➕添加
+                </div>
+            </div>
+        </div>
+
+        <div class="save-area">
+            <button class="save-btn" id="save-deck-btn">💾 保存卡组</button>
+        </div>
+        <div id="message" class="message"></div>
+    </div>
+
+    <!-- 卡牌详情模态框 -->
+    <div id="card-modal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <div class="card-cost" id="modal-card-cost">0</div>
+            <div class="modal-quality" id="modal-card-quality">普通</div>
+            <div id="modal-card-image" class="modal-card-image"></div>
+            <div id="modal-card-name"></div>
+            <div class="modal-card-effects" id="modal-card-effects"></div>
+            <div id="modal-card-description"></div>
+            <div id="modal-card-stats">
+                <div>
+                    <div class="stat-circle attack-circle">
+                        <span id="modal-card-attack">0</span>
+                    </div>
+                    <div class="stat-label">攻击力</div>
+                </div>
+                <div>
+                    <div class="stat-circle health-circle">
+                        <span id="modal-card-health">0</span>
+                    </div>
+                    <div class="stat-label">生命值</div>
+                </div>
+            </div>
+            <div class="modal-owned" id="modal-card-owned">拥有: 0</div>
+            <div class="modal-actions">
+                <button id="modal-add-btn" class="modal-add-btn">➕ 加入卡组</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 数据传递 -->
+    <script>
+        // 从后端传递的数据 (Jinja2 渲染)
+        window.USER_CARDS = {{ cards | tojson }};
+        window.CARD_DETAILS = {{ card_details | tojson }};
+        window.DECK_SIZE = {{ deck_size }};
+        window.USER_DECKS = {{ decks | tojson }};
+    </script>
+    <script src="{{ url_for('static', filename='js/deck.js') }}"></script>
+    <!-- 在 <div class="available-cards"> 内部，<h2> 后面添加 -->
+<div class="search-import-area">
+    <div class="search-box">
+        <input type="text" id="card-search" placeholder="🔍 搜索卡牌名称...">
+        <button id="clear-search" class="clear-search-btn">✕</button>
+    </div>
+    <div class="import-export-btns">
+        <button id="export-deck-btn" class="export-btn" title="导出卡组代码">📤 导出</button>
+        <button id="import-deck-btn" class="import-btn" title="导入卡组代码">📥 导入</button>
+    </div>
+</div>
+
+<!-- 在保存按钮旁边添加复制代码按钮 -->
+<div class="save-area" style="display: flex; gap: 10px; justify-content: center;">
+    <button class="save-btn" id="save-deck-btn">💾 保存卡组</button>
+    <button class="copy-code-btn" id="copy-deck-code-btn" title="复制卡组代码">📋 复制代码</button>
+</div>
+</body>
+</html>
