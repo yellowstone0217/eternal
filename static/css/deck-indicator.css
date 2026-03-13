@@ -1,0 +1,58 @@
+/* deck-indicator.css */
+.deck-indicator {
+    position: absolute;
+    background: rgba(0, 0, 0, 0.7);
+    border: 2px solid #f1c40f;
+    border-radius: 50%;
+    width: 60px;
+    height: 60px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+    z-index: 30;
+    transition: transform 0.2s, background 0.2s;
+    box-shadow: 0 0 10px rgba(241, 196, 15, 0.5);
+}
+
+.deck-indicator:hover {
+    transform: scale(1.1);
+    background: rgba(0, 0, 0, 0.9);
+}
+
+.enemy-deck {
+    top: 10px;
+    left: 10px;
+}
+
+.player-deck {
+    bottom: 10px;
+    right: 10px;
+}
+
+.deck-count {
+    font-size: 20px;
+    line-height: 1;
+}
+
+.deck-label {
+    font-size: 10px;
+    margin-top: 2px;
+    opacity: 0.8;
+}
+
+@media (max-width: 600px) {
+    .deck-indicator {
+        width: 50px;
+        height: 50px;
+    }
+    .deck-count {
+        font-size: 18px;
+    }
+    .deck-label {
+        font-size: 8px;
+    }
+}

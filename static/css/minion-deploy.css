@@ -1,0 +1,172 @@
+/* static/css/minion-deploy.css - 随从部署战场翻面动画 */
+
+/* 翻面动画容器 - 直接定位在战场上的目标位置 */
+.minion-deploy-animation {
+    position: absolute;
+    width: 100px;
+    height: 140px;
+    pointer-events: none;
+    z-index: 9999;
+    animation: flipAndLand 0.6s ease-out forwards;
+}
+
+/* 翻面卡片样式 */
+.deploy-card {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    transform-style: preserve-3d;
+    animation: cardFlip 0.5s ease-out;
+}
+
+.deploy-card .card-front,
+.deploy-card .card-back {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    backface-visibility: hidden;
+    border-radius: 10px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 8px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+    border: 2px solid #f1c40f;
+}
+
+.deploy-card .card-back {
+    background: linear-gradient(135deg, #9b59b6, #3498db);
+    transform: rotateY(180deg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 30px;
+    font-weight: bold;
+}
+
+.deploy-card .card-back::after {
+    content: "?";
+}
+
+.deploy-card .card-front {
+    background: linear-gradient(135deg, #2ecc71, #27ae60);
+    transform: rotateY(0deg);
+}
+
+/* 翻面动画 */
+@keyframes cardFlip {
+    0% {
+        transform: rotateY(0deg);
+    }
+    50% {
+        transform: rotateY(180deg);
+    }
+    100% {
+        transform: rotateY(360deg);
+    }
+}
+
+/* 落地轻微弹跳 */
+@keyframes flipAndLand {
+    0% {
+        transform: scale(0.8) translateY(-50px);
+        opacity: 0;
+    }
+    30% {
+        transform: scale(1.1) translateY(0);
+        opacity: 1;
+    }
+    60% {
+        transform: scale(0.95) translateY(0);
+    }
+    100% {
+        transform: scale(1) translateY(0);
+        opacity: 1;
+    }
+}
+
+/* 部署位置标记 - 用于定位动画 */
+.minion-deploy-marker {
+    position: absolute;
+    width: 100px;
+    height: 140px;
+    border: 3px dashed #f1c40f;
+    border-radius: 10px;
+    animation: pulse 0.5s ease-out;
+    pointer-events: none;
+    z-index: 100;
+}
+
+@keyframes pulse {
+    0% {
+        transform: scale(1);
+        opacity: 1;
+    }
+    50% {
+        transform: scale(1.1);
+        opacity: 0.7;
+    }
+    100% {
+        transform: scale(1);
+        opacity: 0;
+    }
+}
+
+/* 确保战场上的卡片容器有相对定位 */
+.board-area {
+    position: relative;
+}
+
+/* 卡片基础样式补充 */
+.card-image {
+    width: 100%;
+    height: 60px;
+    background-size: cover;
+    background-position: center;
+    border-radius: 5px;
+    background-color: #34495e;
+}
+
+.card-name {
+    font-size: 12px;
+    font-weight: bold;
+    text-align: center;
+    color: white;
+    text-shadow: 1px 1px 2px black;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.card-stats {
+    display: flex;
+    justify-content: space-between;
+    font-size: 14px;
+    font-weight: bold;
+}
+
+.attack {
+    color: #e74c3c;
+}
+
+.health {
+    color: #2ecc71;
+}
+
+.cost {
+    position: absolute;
+    top: 5px;
+    left: 5px;
+    background: #f39c12;
+    color: white;
+    width: 25px;
+    height: 25px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 14px;
+    border: 1px solid white;
+}

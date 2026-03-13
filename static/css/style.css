@@ -1,0 +1,727 @@
+/* 攻击模式样式 */
+.attack-mode .player-board .card {
+    cursor: pointer;
+}
+
+.attack-mode .player-board .card.selected {
+    box-shadow: 0 0 0 3px #f1c40f, 0 0 20px #f1c40f;
+    transform: translateY(-10px);
+}
+
+.attack-mode .enemy-board .card,
+.attack-mode .enemy-hero {
+    cursor: pointer;
+}
+
+.attack-mode .enemy-board .card.targetable,
+.attack-mode .enemy-hero.targetable {
+    box-shadow: 0 0 0 3px #3498db, 0 0 15px #3498db;
+    transform: translateY(-5px);
+}
+
+/* 英雄区域样式 */
+.hero-area {
+    display: flex;
+    justify-content: center;
+    margin: 10px 0;
+}
+
+.hero-portrait {
+    width: 80px;
+    height: 100px;
+    background-color: #7f8c8d;
+    border: 2px solid #f1c40f;
+    border-radius: 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+}
+
+.hero-portrait.enemy {
+    background-color: #c0392b;
+}
+
+.hero-portrait.player {
+    background-color: #27ae60;
+}
+
+.hero-health {
+    font-size: 18px;
+    font-weight: bold;
+    color: #e74c3c;
+}
+
+/* 攻击按钮 */
+#attack-btn {
+    padding: 8px 16px;
+    background: linear-gradient(to right, #e74c3c, #c0392b);
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+    cursor: pointer;
+    margin-left: 10px;
+    display: none;
+}
+
+#cancel-attack-btn {
+    padding: 8px 16px;
+    background: linear-gradient(to right, #7f8c8d, #34495e);
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+    cursor: pointer;
+    margin-left: 10px;
+    display: none;
+}
+
+/* 卡牌详情模态框 */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.7);
+}
+
+.modal-content {
+    background: linear-gradient(135deg, #2c3e50, #1a2a6c);
+    margin: 10% auto;
+    padding: 20px;
+    border-radius: 15px;
+    width: 320px;
+    box-shadow: 0 5px 30px rgba(0,0,0,0.5);
+    position: relative;
+    border: 2px solid #f1c40f;
+    color: white;
+}
+
+.close {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.close:hover {
+    color: #f1c40f;
+}
+
+#modal-card-image {
+    width: 100%;
+    height: 180px;
+    background-size: cover;
+    background-position: center;
+    border-radius: 10px;
+    margin-bottom: 15px;
+    border: 2px solid #3498db;
+    background-color: #34495e;
+}
+
+#modal-card-name {
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 10px;
+    color: #f1c40f;
+    text-align: center;
+}
+
+#modal-card-description {
+    text-align: center;
+    margin-bottom: 15px;
+    color: #ecf0f1;
+    min-height: 60px;
+}
+
+#modal-card-stats {
+    display: flex;
+    justify-content: space-around;
+    width: 100%;
+    font-size: 18px;
+    font-weight: bold;
+    margin-bottom: 15px;
+}
+
+.stat-circle {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    font-weight: bold;
+}
+
+.attack-circle {
+    background: rgba(231, 76, 60, 0.2);
+    border: 2px solid #e74c3c;
+}
+
+.health-circle {
+    background: rgba(46, 204, 113, 0.2);
+    border: 2px solid #2ecc71;
+}
+
+.card-cost {
+    position: absolute;
+    top: 15px;
+    left: 15px;
+    background: #f39c12;
+    color: white;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+}
+
+.warning {
+    color: #e74c3c;
+    font-weight: bold;
+    text-align: center;
+    margin-top: 10px;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+    background: linear-gradient(135deg, #1a2a6c, #2c3e50);
+    color: #fff;
+    min-height: 100vh;
+    padding: 20px;
+    overflow-x: hidden;
+}
+
+.game-container {
+    max-width: 1000px;
+    margin: 0 auto;
+    background: rgba(0, 0, 0, 0.7);
+    border-radius: 15px;
+    padding: 20px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+}
+
+h1 {
+    text-align: center;
+    margin-bottom: 20px;
+    color: #f1c40f;
+    text-shadow: 0 0 10px rgba(241, 196, 15, 0.5);
+}
+
+.game-board {
+    display: flex;
+    flex-direction: column;
+    height: 70vh;
+    background: #2c3e50;
+    border-radius: 10px;
+    overflow: hidden;
+    position: relative;
+    border: 3px solid #34495e;
+    margin-bottom: 20px;
+}
+
+.enemy-area, .player-area {
+    display: flex;
+    flex-direction: column;
+    height: 50%;
+    padding: 10px;
+    position: relative;
+}
+
+.player-area {
+    background: rgba(0, 0, 0, 0.2);
+}
+
+.enemy-area {
+    background: rgba(0, 0, 0, 0.3);
+}
+
+.board-area {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    height: 100%;
+    padding: 10px;
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+.hand-area {
+    display: flex;
+    justify-content: center;
+    position: relative;
+    height: 180px;
+    padding: 0;
+    margin: 20px 0;
+    perspective: 1000px;
+}
+
+.player-hand .card-container {
+    position: absolute;
+    bottom: 0;
+    transition: all 0.3s ease;
+    transform-origin: bottom center;
+}
+
+.player-hand .card-container:nth-child(1) { transform: rotate(-15deg) translateX(-80px); z-index: 1; }
+.player-hand .card-container:nth-child(2) { transform: rotate(-7.5deg) translateX(-40px); z-index: 2; }
+.player-hand .card-container:nth-child(3) { transform: rotate(0deg) translateX(0); z-index: 3; }
+.player-hand .card-container:nth-child(4) { transform: rotate(7.5deg) translateX(40px); z-index: 4; }
+.player-hand .card-container:nth-child(5) { transform: rotate(15deg) translateX(80px); z-index: 5; }
+.player-hand .card-container:nth-child(6) { transform: rotate(22.5deg) translateX(120px); z-index: 6; }
+.player-hand .card-container:nth-child(7) { transform: rotate(30deg) translateX(160px); z-index: 7; }
+.player-hand .card-container:nth-child(8) { transform: rotate(37.5deg) translateX(200px); z-index: 8; }
+.player-hand .card-container:nth-child(9) { transform: rotate(45deg) translateX(240px); z-index: 9; }
+
+.player-hand .card-container:hover {
+    transform: rotate(0deg) translateY(-30px) !important;
+    z-index: 100;
+}
+
+.health-display, .enemy-health-display {
+    position: absolute;
+    top: 20px;
+    background: rgba(0, 0, 0, 0.6);
+    padding: 10px 15px;
+    border-radius: 10px;
+    border: 2px solid #f1c40f;
+    z-index: 20;
+    font-size: 16px;
+    font-weight: bold;
+}
+
+.health-display {
+    left: 20px;
+}
+
+.enemy-health-display {
+    right: 20px;
+}
+
+.battlefield-divider {
+    position: absolute;
+    top: 50%;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(to right, transparent, #f1c40f, transparent);
+    transform: translateY(-50%);
+    z-index: 10;
+}
+
+.card-container {
+    position: relative;
+    display: inline-block;
+    margin: 0 5px;
+    flex-shrink: 0;
+}
+
+.cant-attack-mark {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    width: 25px;
+    height: 25px;
+    background: rgba(231, 76, 60, 0.8);
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 18px;
+    z-index: 10;
+}
+
+.action-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 10px;
+    flex-wrap: wrap;
+}
+
+.action-btn {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 5px;
+    font-size: 14px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.play-btn {
+    background: linear-gradient(to right, #2ecc71, #27ae60);
+    color: white;
+}
+
+.attack-btn {
+    background: linear-gradient(to right, #e74c3c, #c0392b);
+    color: white;
+}
+
+.attack-hero-btn {
+    background: linear-gradient(to right, #3498db, #2980b9);
+    color: white;
+}
+
+.action-btn:disabled {
+    background: #7f8c8d;
+    cursor: not-allowed;
+}
+
+.action-btn:hover:not(:disabled) {
+    transform: scale(1.05);
+}
+
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.7);
+}
+
+.modal-content {
+    background: linear-gradient(135deg, #2c3e50, #1a2a6c);
+    margin: 10% auto;
+    padding: 20px;
+    border-radius: 15px;
+    width: 320px;
+    box-shadow: 0 5px 30px rgba(0,0,0,0.5);
+    position: relative;
+    border: 2px solid #f1c40f;
+    color: white;
+}
+
+.close {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.close:hover {
+    color: #f1c40f;
+}
+
+#modal-card-image {
+    width: 100%;
+    height: 180px;
+    background-size: cover;
+    background-position: center;
+    border-radius: 10px;
+    margin-bottom: 15px;
+    border: 2px solid #3498db;
+    background-color: #34495e;
+}
+
+#modal-card-name {
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 10px;
+    color: #f1c40f;
+    text-align: center;
+}
+
+.modal-card-effects {
+    display: flex;
+    justify-content: center;
+    gap: 5px;
+    margin-bottom: 10px;
+    flex-wrap: wrap;
+}
+
+.modal-effect-tag {
+    background: rgba(241, 196, 15, 0.2);
+    border: 1px solid #f1c40f;
+    border-radius: 10px;
+    padding: 3px 10px;
+    font-size: 12px;
+    font-weight: bold;
+    color: #f1c40f;
+}
+
+#modal-card-description {
+    text-align: center;
+    margin-bottom: 15px;
+    color: #ecf0f1;
+    min-height: 60px;
+}
+
+#modal-card-stats {
+    display: flex;
+    justify-content: space-around;
+    width: 100%;
+    font-size: 18px;
+    font-weight: bold;
+    margin-bottom: 15px;
+}
+
+.stat-circle {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    font-weight: bold;
+}
+
+.attack-circle {
+    background: rgba(231, 76, 60, 0.2);
+    border: 2px solid #e74c3c;
+}
+
+.health-circle {
+    background: rgba(46, 204, 113, 0.2);
+    border: 2px solid #2ecc71;
+}
+
+.card-cost {
+    position: absolute;
+    top: 15px;
+    left: 15px;
+    background: #f39c12;
+    color: white;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+}
+        
+.warning {
+    color: #e74c3c;
+    font-weight: bold;
+    text-align: center;
+    margin-top: 10px;
+}
+        
+.card {
+    width: 100px;
+    height: 140px;
+    background: linear-gradient(135deg, #3498db, #8e44ad);
+    border-radius: 10px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 8px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+    border: 2px solid #f1c40f;
+    transition: all 0.3s ease;
+}
+        
+.card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.4);
+}
+        
+.card.enemy {
+    background: linear-gradient(135deg, #e74c3c, #c0392b);
+}
+        
+.card.player {
+    background: linear-gradient(135deg, #2ecc71, #27ae60);
+}
+        
+.card-back {
+    background: linear-gradient(45deg, #9b59b6, #3498db);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid #ecf0f1;
+}
+        
+.card-back::before {
+    content: "?";
+    font-size: 30px;
+    color: white;
+    font-weight: bold;
+}
+        
+.card-image {
+    width: 100%;
+    height: 50px;
+    background-size: cover;
+    background-position: center;
+    border-radius: 5px;
+    margin-bottom: 3px;
+    background-color: #34495e;
+}
+        
+.card-name {
+    font-size: 12px;
+    font-weight: bold;
+    text-align: center;
+    margin-bottom: 3px;
+    color: #fff;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.7);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+        
+.card-stats {
+    display: flex;
+    justify-content: space-between;
+    font-size: 14px;
+    font-weight: bold;
+}
+        
+.attack {
+    color: #e74c3c;
+}
+        
+.health {
+    color: #2ecc71;
+}
+        
+#game-message {
+    font-size: 18px;
+    font-weight: bold;
+    color: #f1c40f;
+    text-align: center;
+    height: 30px;
+    margin-top: 10px;
+}
+        
+.attack-mode .player-board .card {
+    cursor: pointer;
+}
+        
+.attack-mode .player-board .card.selected {
+    box-shadow: 0 0 0 3px #f1c40f, 0 0 20px #f1c40f;
+    transform: translateY(-10px);
+}
+        
+.attack-mode .enemy-board .card {
+    cursor: pointer;
+}
+        
+.attack-mode .enemy-board .card.targetable {
+    box-shadow: 0 0 0 3px #3498db, 0 0 15px #3498db;
+    transform: translateY(-5px);
+}
+
+/* 效果标签样式 */
+.card-effects {
+    display: flex;
+    justify-content: center;
+    gap: 5px;
+    margin-bottom: 5px;
+    flex-wrap: wrap;
+}
+
+.effect-tag {
+    background: rgba(241, 196, 15, 0.2);
+    border: 1px solid #f1c40f;
+    border-radius: 10px;
+    padding: 2px 8px;
+    font-size: 10px;
+    font-weight: bold;
+    color: #f1c40f;
+}
+
+
+/* ===== 攻击动画 ===== */
+.attacking {
+    animation: attack-shake 0.3s ease;
+}
+.targeted {
+    animation: target-flash 0.3s ease;
+}
+@keyframes attack-shake {
+    0% { transform: translateX(0); }
+    25% { transform: translateX(-5px); }
+    50% { transform: translateX(5px); }
+    75% { transform: translateX(-5px); }
+    100% { transform: translateX(0); }
+}
+@keyframes target-flash {
+    0% { background-color: rgba(255, 0, 0, 0.2); }
+    50% { background-color: rgba(255, 0, 0, 0.8); }
+    100% { background-color: rgba(255, 0, 0, 0.2); }
+}
+
+/* ===== 横屏适配 ===== */
+@media (orientation: landscape) {
+    .game-container {
+        max-width: 1200px;
+    }
+    .game-board {
+        height: 80vh;
+    }
+    .hand-area {
+        height: 160px;
+    }
+    .card {
+        width: 90px;
+        height: 126px;
+    }
+    .card-image {
+        height: 40px;
+    }
+    /* 调整卡牌容器间距，避免重叠 */
+    .player-hand .card-container {
+        margin: 0 -15px;
+    }
+    .player-hand .card-container:hover {
+        transform: rotate(0deg) translateY(-20px) !important;
+    }
+}
+
+
+
+
+
+
+
+
+/* 随从属性变化动画 */
+.stat-change {
+    animation: statPulse 0.3s ease-out;
+}
+
+@keyframes statPulse {
+    0% {
+        transform: scale(1);
+        opacity: 1;
+    }
+    50% {
+        transform: scale(1.5);
+        opacity: 0.7;
+    }
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}

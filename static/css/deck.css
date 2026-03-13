@@ -1,0 +1,718 @@
+/* deck.css - 组卡界面样式 */
+* {
+    box-sizing: border-box;
+    font-family: 'Segoe UI', Roboto, system-ui, sans-serif;
+}
+
+body {
+    background: linear-gradient(135deg, #1a2a6c, #2c3e50);
+    color: #fff;
+    margin: 0;
+    min-height: 100vh;
+    padding: 15px;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    background: rgba(0,0,0,0.5);
+    backdrop-filter: blur(5px);
+    border-radius: 20px;
+    padding: 20px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+}
+
+h1 {
+    text-align: center;
+    color: #f1c40f;
+    margin-top: 0;
+    margin-bottom: 20px;
+    font-size: 2em;
+}
+
+.deck-header {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    align-items: center;
+    background: #34495e;
+    padding: 15px;
+    border-radius: 15px;
+    margin-bottom: 20px;
+}
+
+.deck-header label {
+    font-weight: bold;
+    color: #ecf0f1;
+}
+
+.deck-header input, .deck-header select {
+    padding: 10px 12px;
+    border-radius: 8px;
+    border: 2px solid #7f8c8d;
+    background: #2c3e50;
+    color: white;
+    font-size: 16px;
+    flex: 1 1 200px;
+}
+
+.deck-header button {
+    padding: 10px 20px;
+    background: linear-gradient(to right, #3498db, #2980b9);
+    border: none;
+    border-radius: 8px;
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+    transition: transform 0.2s;
+    border: 1px solid #f1c40f;
+}
+
+.deck-header button:hover {
+    transform: scale(1.03);
+    background: linear-gradient(to right, #3cb0fd, #3498db);
+}
+
+.deck-header button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.main-panel {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 20px;
+}
+
+.available-cards {
+    flex: 2;
+    min-width: 300px;
+    background: #2c3e50;
+    border-radius: 15px;
+    padding: 15px;
+    max-height: 600px;
+    overflow-y: auto;
+}
+
+.current-deck {
+    flex: 1;
+    min-width: 250px;
+    background: #34495e;
+    border-radius: 15px;
+    padding: 15px;
+    display: flex;
+    flex-direction: column;
+    max-height: 600px;
+}
+
+.card-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 12px;
+}
+
+.card-item {
+    background: linear-gradient(145deg, #3a4a5a, #2c3e50);
+    border: 2px solid #7f8c8d;
+    border-radius: 12px;
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    transition: all 0.2s;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+    color: #ecf0f1;
+    cursor: pointer;
+}
+
+.card-item:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 15px rgba(241, 196, 15, 0.3);
+    border-color: #f1c40f;
+}
+
+.card-item.insufficient {
+    opacity: 0.5;
+    border-color: #e74c3c;
+}
+
+.card-item .card-name {
+    font-weight: bold;
+    font-size: 1.1em;
+    color: #f1c40f;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.card-item .card-cost {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    background: #f39c12;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    color: #2c3e50;
+    border: 2px solid white;
+}
+
+.card-stats {
+    display: flex;
+    justify-content: space-between;
+    margin: 8px 0 4px;
+}
+
+.attack { color: #e74c3c; font-weight: bold; }
+.health { color: #2ecc71; font-weight: bold; }
+
+.effect-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    margin: 5px 0;
+}
+
+.effect-tag {
+    background: rgba(241,196,15,0.2);
+    border: 1px solid #f1c40f;
+    border-radius: 12px;
+    padding: 2px 8px;
+    font-size: 0.7em;
+    color: #f1c40f;
+}
+
+.card-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 8px;
+}
+
+.owned {
+    font-size: 0.85em;
+    background: #1e2b38;
+    padding: 2px 8px;
+    border-radius: 20px;
+}
+
+.add-btn {
+    background: #27ae60;
+    border: none;
+    color: white;
+    font-weight: bold;
+    padding: 5px 12px;
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 0.9em;
+    transition: background 0.2s;
+}
+
+.add-btn:hover {
+    background: #2ecc71;
+}
+
+.add-btn:disabled {
+    background: #7f8c8d;
+    cursor: not-allowed;
+}
+
+.deck-list {
+    flex: 1;
+    overflow-y: auto;
+    margin: 10px 0;
+    list-style: none;
+    padding: 0;
+}
+
+.deck-list li {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #3a4a5a;
+    margin-bottom: 8px;
+    padding: 8px 12px;
+    border-radius: 30px;
+    border: 1px solid #f1c40f;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.deck-list li:hover {
+    background: #4a5a6a;
+    transform: translateX(5px);
+    border-color: #3498db;
+}
+
+.deck-card-name {
+    font-weight: bold;
+    max-width: 120px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.remove-btn {
+    background: #e74c3c;
+    border: none;
+    color: white;
+    border-radius: 50%;
+    width: 26px;
+    height: 26px;
+    font-weight: bold;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2em;
+    line-height: 1;
+    transition: all 0.2s;
+}
+
+.remove-btn:hover {
+    background: #c0392b;
+    transform: scale(1.1);
+}
+
+.deck-stats {
+    background: #2c3e50;
+    padding: 12px;
+    border-radius: 10px;
+    margin-top: 10px;
+    font-size: 1.1em;
+}
+
+.save-area {
+    margin-top: 20px;
+    text-align: center;
+}
+
+.save-btn {
+    padding: 14px 40px;
+    font-size: 1.3em;
+    background: linear-gradient(to right, #2ecc71, #27ae60);
+    border: none;
+    border-radius: 40px;
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+    box-shadow: 0 4px 10px rgba(46,204,113,0.4);
+    transition: transform 0.2s;
+    border: 2px solid #f1c40f;
+}
+
+.save-btn:hover {
+    transform: scale(1.05);
+}
+
+.message {
+    text-align: center;
+    margin: 10px 0;
+    min-height: 30px;
+    font-weight: bold;
+    color: #f1c40f;
+}
+
+.error {
+    color: #e74c3c;
+}
+
+.warning {
+    color: #f39c12;
+}
+
+/* 移动端优化 */
+@media (max-width: 700px) {
+    .main-panel {
+        flex-direction: column;
+    }
+    .card-grid {
+        grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    }
+    .deck-header {
+        flex-direction: column;
+        align-items: stretch;
+    }
+}
+
+/* 卡牌详情模态框样式 */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.7);
+}
+
+.modal-content {
+    background: linear-gradient(135deg, #2c3e50, #1a2a6c);
+    margin: 5% auto;
+    padding: 25px;
+    border-radius: 20px;
+    width: 350px;
+    max-width: 90%;
+    box-shadow: 0 5px 30px rgba(0,0,0,0.5);
+    position: relative;
+    border: 3px solid #f1c40f;
+    color: white;
+    animation: modalSlideIn 0.3s ease;
+}
+
+@keyframes modalSlideIn {
+    from {
+        transform: translateY(-50px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+.close {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+    position: absolute;
+    right: 15px;
+    top: 10px;
+    transition: color 0.2s;
+}
+
+.close:hover {
+    color: #f1c40f;
+}
+
+.modal-card-image {
+    width: 100%;
+    height: 160px;
+    background-size: cover;
+    background-position: center;
+    border-radius: 10px;
+    margin-bottom: 15px;
+    border: 2px solid #3498db;
+    background-color: #34495e;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 48px;
+    font-weight: bold;
+    color: rgba(255,255,255,0.3);
+}
+
+#modal-card-name {
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 10px;
+    color: #f1c40f;
+    text-align: center;
+    padding-right: 20px;
+}
+
+.modal-card-effects {
+    display: flex;
+    justify-content: center;
+    gap: 5px;
+    margin-bottom: 15px;
+    flex-wrap: wrap;
+}
+
+.modal-effect-tag {
+    background: rgba(241, 196, 15, 0.2);
+    border: 1px solid #f1c40f;
+    border-radius: 12px;
+    padding: 4px 12px;
+    font-size: 12px;
+    font-weight: bold;
+    color: #f1c40f;
+}
+
+#modal-card-description {
+    text-align: center;
+    margin-bottom: 20px;
+    color: #ecf0f1;
+    min-height: 60px;
+    line-height: 1.5;
+    background: rgba(0,0,0,0.2);
+    padding: 12px;
+    border-radius: 8px;
+}
+
+#modal-card-stats {
+    display: flex;
+    justify-content: space-around;
+    width: 100%;
+    font-size: 18px;
+    font-weight: bold;
+    margin-bottom: 20px;
+}
+
+.stat-circle {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    font-weight: bold;
+    margin: 0 auto 5px;
+}
+
+.attack-circle {
+    background: rgba(231, 76, 60, 0.2);
+    border: 3px solid #e74c3c;
+    color: #e74c3c;
+}
+
+.health-circle {
+    background: rgba(46, 204, 113, 0.2);
+    border: 3px solid #2ecc71;
+    color: #2ecc71;
+}
+
+.stat-label {
+    text-align: center;
+    color: #ecf0f1;
+    font-size: 14px;
+}
+
+.card-cost {
+    position: absolute;
+    top: 15px;
+    left: 15px;
+    background: #f39c12;
+    color: white;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 18px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+    border: 2px solid white;
+    z-index: 10;
+}
+
+.modal-quality {
+    position: absolute;
+    top: 15px;
+    right: 45px;
+    background: rgba(52, 73, 94, 0.9);
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    border: 1px solid #f1c40f;
+    color: #f1c40f;
+}
+
+.modal-owned {
+    text-align: center;
+    margin-top: 10px;
+    font-size: 14px;
+    color: #3498db;
+}
+
+.modal-actions {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin-top: 20px;
+}
+
+.modal-add-btn {
+    background: #27ae60;
+    border: none;
+    color: white;
+    font-weight: bold;
+    padding: 10px 30px;
+    border-radius: 30px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: all 0.2s;
+    border: 1px solid #f1c40f;
+}
+
+.modal-add-btn:hover:not(:disabled) {
+    background: #2ecc71;
+    transform: scale(1.05);
+}
+
+.modal-add-btn:disabled {
+    background: #7f8c8d;
+    cursor: not-allowed;
+    opacity: 0.5;
+}
+
+/* 搜索和导入导出区域 */
+.search-import-area {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+    gap: 10px;
+}
+
+.search-box {
+    position: relative;
+    flex: 1;
+    min-width: 200px;
+}
+
+.search-box input {
+    width: 100%;
+    padding: 8px 30px 8px 10px;
+    border: 1px solid #34495e;
+    border-radius: 4px;
+    background-color: #2c3e50;
+    color: #ecf0f1;
+    font-size: 14px;
+}
+
+.search-box input:focus {
+    outline: none;
+    border-color: #3498db;
+}
+
+.clear-search-btn {
+    position: absolute;
+    right: 5px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    color: #95a5a6;
+    cursor: pointer;
+    font-size: 16px;
+    display: none;
+}
+
+.clear-search-btn:hover {
+    color: #e74c3c;
+}
+
+.import-export-btns {
+    display: flex;
+    gap: 5px;
+}
+
+.export-btn, .import-btn, .copy-code-btn {
+    padding: 8px 12px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: all 0.3s;
+}
+
+.export-btn {
+    background-color: #27ae60;
+    color: white;
+}
+
+.export-btn:hover {
+    background-color: #2ecc71;
+}
+
+.import-btn {
+    background-color: #f39c12;
+    color: white;
+}
+
+.import-btn:hover {
+    background-color: #f1c40f;
+}
+
+.copy-code-btn {
+    background-color: #3498db;
+    color: white;
+}
+
+.copy-code-btn:hover {
+    background-color: #2980b9;
+}
+
+/* 导入模态框 */
+.import-modal {
+    display: none;
+    position: fixed;
+    z-index: 1001;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.7);
+}
+
+.import-modal-content {
+    background-color: #2c3e50;
+    margin: 10% auto;
+    padding: 20px;
+    border: 1px solid #34495e;
+    border-radius: 8px;
+    width: 80%;
+    max-width: 500px;
+    color: #ecf0f1;
+}
+
+.import-modal-content textarea {
+    width: 100%;
+    height: 150px;
+    padding: 10px;
+    margin: 10px 0;
+    background-color: #34495e;
+    border: 1px solid #4a6782;
+    border-radius: 4px;
+    color: #ecf0f1;
+    font-family: monospace;
+    resize: vertical;
+}
+
+.import-modal-btns {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+}
+
+.import-confirm-btn {
+    background-color: #27ae60;
+    color: white;
+    padding: 8px 16px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.import-cancel-btn {
+    background-color: #e74c3c;
+    color: white;
+    padding: 8px 16px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.highlight-card {
+    animation: highlight 1s ease-in-out;
+    border: 2px solid #f1c40f !important;
+    box-shadow: 0 0 15px #f1c40f;
+}
+
+@keyframes highlight {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+}
