@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>联结之战 - 卡牌对战游戏</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            background: linear-gradient(135deg, #1a1a1a, #2c3e50);
+            color: white;
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        .container {
+            text-align: center;
+            max-width: 600px;
+        }
+        .logo {
+            font-size: 80px;
+            margin-bottom: 20px;
+        }
+        h1 {
+            font-size: 3em;
+            color: #f1c40f;
+            margin-bottom: 10px;
+            text-shadow: 0 0 30px rgba(241, 196, 15, 0.3);
+        }
+        .tagline {
+            font-size: 1.2em;
+            color: #bdc3c7;
+            margin-bottom: 30px;
+        }
+        .features {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 40px;
+        }
+        .feature {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 15px;
+            padding: 20px;
+            width: 130px;
+        }
+        .feature-icon { font-size: 30px; margin-bottom: 10px; }
+        .feature-title { font-size: 14px; color: #f1c40f; font-weight: bold; }
+        .feature-desc { font-size: 11px; color: #999; margin-top: 5px; }
+        .btn {
+            display: inline-block;
+            padding: 15px 40px;
+            margin: 10px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 16px;
+            transition: all 0.3s;
+        }
+        .btn-primary {
+            background: linear-gradient(45deg, #f1c40f, #e67e22);
+            color: #1a1a1a;
+        }
+        .btn-secondary {
+            background: rgba(255,255,255,0.1);
+            color: white;
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="logo">🎴</div>
+        <h1>联结之战</h1>
+        <p class="tagline">一个自研的卡牌对战游戏 · 80+ 卡牌 · Q-Learning 行为主义 AI</p>
+        
+        <div class="features">
+            <div class="feature">
+                <div class="feature-icon">🧠</div>
+                <div class="feature-title">行为主义 AI</div>
+                <div class="feature-desc">Q-Learning 自对弈训练，越打越聪明</div>
+            </div>
+            <div class="feature">
+                <div class="feature-icon">🎨</div>
+                <div class="feature-title">DIY 系统</div>
+                <div class="feature-desc">自制卡牌，管理员审核后加入游戏</div>
+            </div>
+            <div class="feature">
+                <div class="feature-icon">🛡️</div>
+                <div class="feature-title">反作弊</div>
+                <div class="feature-desc">违规永封</div>
+            </div>
+        </div>
+        
+        <a href="https://github.com/yellowstone0217/eternal" class="btn btn-primary">GitHub 仓库</a>
+        <a href="https://github.com/yellowstone0217/eternal/releases" class="btn btn-secondary">下载最新版</a>
+    </div>
+</body>
+</html>
